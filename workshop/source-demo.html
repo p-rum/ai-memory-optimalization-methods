@@ -1,0 +1,356 @@
+<!doctype html><html lang="cs"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Skutečný zdroj: normalize</title><style>body{background:#101728;color:#f0f4ff;font:20px system-ui;max-width:1100px;margin:auto;padding:35px}h1{font-size:42px}h2{color:#75dfc8}pre{background:#23334d;padding:18px;white-space:pre-wrap;font:16px monospace}details{margin:20px 0}summary{cursor:pointer}a{color:#75dfc8}td,th{padding:12px;border-bottom:1px solid #556}table{border-collapse:collapse}</style><h1>Skutečný kód: odkud přichází normalize?</h1><p>scikit-learn 1.8.0 • skutečný instalovaný zdroj • AST import → reexport → definice</p><p>Otázka: které tři zdrojové úseky vysvětlují, jak se normalize dostane do sklearn.feature_extraction.text?</p><h2>Tipněte úplnost pro top‑k = 3</h2><p>Vektorový index vybírá podobný text. Graf prochází explicitní importy; počáteční modul a symbol jsou známé.</p><details><summary>vector@3 — odhalit důkazy</summary><p>Úplné: False • recall 0.667 • 2600 B</p><pre>sklearn.feature_extraction.text:28-28
+from sklearn.preprocessing import normalize</pre><pre>sklearn.feature_extraction.text:chunk-1
+&quot;&quot;&quot;Utilities to build feature vectors from text documents.&quot;&quot;&quot;
+
+# Authors: The scikit-learn developers
+# SPDX-License-Identifier: BSD-3-Clause
+
+import array
+import re
+import unicodedata
+import warnings
+from collections import defaultdict
+from collections.abc import Mapping
+from functools import partial
+from numbers import Integral
+from operator import itemgetter
+
+import numpy as np
+import scipy.sparse as sp
+
+from sklearn.base import (
+    BaseEstimator,
+    OneToOneFeatureMixin,
+    TransformerMixin,
+    _fit_context,
+)
+from sklearn.exceptions import NotFittedError
+from sklearn.feature_extraction._hash import FeatureHasher
+from sklearn.feature_extraction._stop_words import ENGLISH_STOP_WORDS
+from sklearn.preprocessing import normalize
+from sklearn.utils import metadata_routing
+from sklearn.utils._param_validation import HasMethods, Interval, RealNotInt, StrOptions
+from sklearn.utils.fixes import _IS_32BIT
+from sklearn.utils.validation import (
+    FLOAT_DTYPES,
+    check_array,
+    check_is_fitted,
+    validate_data,
+)
+
+__all__ = [
+    &quot;ENGLISH_STOP_WORDS&quot;,</pre><pre>sklearn.preprocessing._data:chunk-1961
+def normalize(X, norm=&quot;l2&quot;, *, axis=1, copy=True, return_norm=False):
+    &quot;&quot;&quot;Scale input vectors individually to unit norm (vector length).
+
+    Read more in the :ref:`User Guide &lt;preprocessing_normalization&gt;`.
+
+    Parameters
+    ----------
+    X : {array-like, sparse matrix} of shape (n_samples, n_features)
+        The data to normalize, element by element.
+        scipy.sparse matrices should be in CSR format to avoid an
+        un-necessary copy.
+
+    norm : {&#x27;l1&#x27;, &#x27;l2&#x27;, &#x27;max&#x27;}, default=&#x27;l2&#x27;
+        The norm to use to normalize each non zero sample (or each non-zero
+        feature if axis is 0).
+
+    axis : {0, 1}, default=1
+        Define axis used to normalize the data along. If 1, independently
+        normalize each sample, otherwise (if 0) normalize each feature.
+
+    copy : bool, default=True
+        If False, try to avoid a copy and normalize in place.
+        This is not guaranteed to always work in place; e.g. if the data is
+        a numpy array with an int dtype, a copy will be returned even with
+        copy=False.
+
+    return_norm : bool, default=False
+        Whether to return the computed norms.
+
+    Returns
+    -------
+    X : {ndarray, sparse matrix} of shape (n_samples, n_features)
+        Normalized input X.
+
+    norms : ndarray of shape (n_samples, ) if axis=1 else (n_features, )
+        An array of norms along given axis for X.
+        When X is sparse, a NotImplementedError will be raised
+        for norm &#x27;l1&#x27; or &#x27;l2&#x27;.
+
+    See Also</pre></details><details><summary>vector@8 — odhalit důkazy</summary><p>Úplné: True • recall 1.0 • 6904 B</p><pre>sklearn.feature_extraction.text:28-28
+from sklearn.preprocessing import normalize</pre><pre>sklearn.feature_extraction.text:chunk-1
+&quot;&quot;&quot;Utilities to build feature vectors from text documents.&quot;&quot;&quot;
+
+# Authors: The scikit-learn developers
+# SPDX-License-Identifier: BSD-3-Clause
+
+import array
+import re
+import unicodedata
+import warnings
+from collections import defaultdict
+from collections.abc import Mapping
+from functools import partial
+from numbers import Integral
+from operator import itemgetter
+
+import numpy as np
+import scipy.sparse as sp
+
+from sklearn.base import (
+    BaseEstimator,
+    OneToOneFeatureMixin,
+    TransformerMixin,
+    _fit_context,
+)
+from sklearn.exceptions import NotFittedError
+from sklearn.feature_extraction._hash import FeatureHasher
+from sklearn.feature_extraction._stop_words import ENGLISH_STOP_WORDS
+from sklearn.preprocessing import normalize
+from sklearn.utils import metadata_routing
+from sklearn.utils._param_validation import HasMethods, Interval, RealNotInt, StrOptions
+from sklearn.utils.fixes import _IS_32BIT
+from sklearn.utils.validation import (
+    FLOAT_DTYPES,
+    check_array,
+    check_is_fitted,
+    validate_data,
+)
+
+__all__ = [
+    &quot;ENGLISH_STOP_WORDS&quot;,</pre><pre>sklearn.preprocessing._data:chunk-1961
+def normalize(X, norm=&quot;l2&quot;, *, axis=1, copy=True, return_norm=False):
+    &quot;&quot;&quot;Scale input vectors individually to unit norm (vector length).
+
+    Read more in the :ref:`User Guide &lt;preprocessing_normalization&gt;`.
+
+    Parameters
+    ----------
+    X : {array-like, sparse matrix} of shape (n_samples, n_features)
+        The data to normalize, element by element.
+        scipy.sparse matrices should be in CSR format to avoid an
+        un-necessary copy.
+
+    norm : {&#x27;l1&#x27;, &#x27;l2&#x27;, &#x27;max&#x27;}, default=&#x27;l2&#x27;
+        The norm to use to normalize each non zero sample (or each non-zero
+        feature if axis is 0).
+
+    axis : {0, 1}, default=1
+        Define axis used to normalize the data along. If 1, independently
+        normalize each sample, otherwise (if 0) normalize each feature.
+
+    copy : bool, default=True
+        If False, try to avoid a copy and normalize in place.
+        This is not guaranteed to always work in place; e.g. if the data is
+        a numpy array with an int dtype, a copy will be returned even with
+        copy=False.
+
+    return_norm : bool, default=False
+        Whether to return the computed norms.
+
+    Returns
+    -------
+    X : {ndarray, sparse matrix} of shape (n_samples, n_features)
+        Normalized input X.
+
+    norms : ndarray of shape (n_samples, ) if axis=1 else (n_features, )
+        An array of norms along given axis for X.
+        When X is sparse, a NotImplementedError will be raised
+        for norm &#x27;l1&#x27; or &#x27;l2&#x27;.
+
+    See Also</pre><pre>sklearn.preprocessing._data:chunk-2001
+    --------
+    Normalizer : Performs normalization using the Transformer API
+        (e.g. as part of a preprocessing :class:`~sklearn.pipeline.Pipeline`).
+
+    Notes
+    -----
+    For a comparison of the different scalers, transformers, and normalizers,
+    see: :ref:`sphx_glr_auto_examples_preprocessing_plot_all_scaling.py`.
+
+    Examples
+    --------
+    &gt;&gt;&gt; from sklearn.preprocessing import normalize
+    &gt;&gt;&gt; X = [[-2, 1, 2], [-1, 0, 1]]
+    &gt;&gt;&gt; normalize(X, norm=&quot;l1&quot;)  # L1 normalization each row independently
+    array([[-0.4,  0.2,  0.4],
+           [-0.5,  0. ,  0.5]])
+    &gt;&gt;&gt; normalize(X, norm=&quot;l2&quot;)  # L2 normalization each row independently
+    array([[-0.67, 0.33, 0.67],
+           [-0.71, 0.  , 0.71]])
+    &quot;&quot;&quot;
+    if axis == 0:
+        sparse_format = &quot;csc&quot;
+    else:  # axis == 1:
+        sparse_format = &quot;csr&quot;
+
+    xp, _ = get_namespace(X)
+
+    X = check_array(
+        X,
+        accept_sparse=sparse_format,
+        copy=copy,
+        estimator=&quot;the normalize function&quot;,
+        dtype=_array_api.supported_float_dtypes(xp),
+        force_writeable=True,
+    )
+    if axis == 0:
+        X = X.T
+
+    if sparse.issparse(X):
+        if return_norm and norm in (&quot;l1&quot;, &quot;l2&quot;):</pre><pre>sklearn.preprocessing._data:1961-1976
+def normalize(X, norm=&quot;l2&quot;, *, axis=1, copy=True, return_norm=False):
+    &quot;&quot;&quot;Scale input vectors individually to unit norm (vector length).
+
+    Read more in the :ref:`User Guide &lt;preprocessing_normalization&gt;`.
+
+    Parameters
+    ----------
+    X : {array-like, sparse matrix} of shape (n_samples, n_features)
+        The data to normalize, element by element.
+        scipy.sparse matrices should be in CSR format to avoid an
+        un-necessary copy.
+
+    norm : {&#x27;l1&#x27;, &#x27;l2&#x27;, &#x27;max&#x27;}, default=&#x27;l2&#x27;
+        The norm to use to normalize each non zero sample (or each non-zero
+        feature if axis is 0).
+</pre><pre>sklearn.preprocessing._data:chunk-1
+# Authors: The scikit-learn developers
+# SPDX-License-Identifier: BSD-3-Clause
+
+
+import warnings
+from numbers import Integral, Real
+
+import numpy as np
+from scipy import sparse, stats
+from scipy.special import boxcox, inv_boxcox
+
+from sklearn.base import (
+    BaseEstimator,
+    ClassNamePrefixFeaturesOutMixin,
+    OneToOneFeatureMixin,
+    TransformerMixin,
+    _fit_context,
+)
+from sklearn.preprocessing._encoders import OneHotEncoder
+from sklearn.utils import _array_api, check_array, metadata_routing, resample
+from sklearn.utils._array_api import (
+    _find_matching_floating_dtype,
+    _max_precision_float_dtype,
+    _modify_in_place_if_numpy,
+    device,
+    get_namespace,
+    get_namespace_and_device,
+    size,
+    supported_float_dtypes,
+)
+from sklearn.utils._param_validation import (
+    Interval,
+    Options,
+    StrOptions,
+    validate_params,
+)
+from sklearn.utils.extmath import _incremental_mean_and_var, row_norms
+from sklearn.utils.sparsefuncs import (
+    incr_mean_variance_axis,
+    inplace_column_scale,</pre><pre>sklearn.preprocessing:chunk-1
+&quot;&quot;&quot;Methods for scaling, centering, normalization, binarization, and more.&quot;&quot;&quot;
+
+# Authors: The scikit-learn developers
+# SPDX-License-Identifier: BSD-3-Clause
+
+from sklearn.preprocessing._data import (
+    Binarizer,
+    KernelCenterer,
+    MaxAbsScaler,
+    MinMaxScaler,
+    Normalizer,
+    PowerTransformer,
+    QuantileTransformer,
+    RobustScaler,
+    StandardScaler,
+    add_dummy_feature,
+    binarize,
+    maxabs_scale,
+    minmax_scale,
+    normalize,
+    power_transform,
+    quantile_transform,
+    robust_scale,
+    scale,
+)
+from sklearn.preprocessing._discretization import KBinsDiscretizer
+from sklearn.preprocessing._encoders import OneHotEncoder, OrdinalEncoder
+from sklearn.preprocessing._function_transformer import FunctionTransformer
+from sklearn.preprocessing._label import (
+    LabelBinarizer,
+    LabelEncoder,
+    MultiLabelBinarizer,
+    label_binarize,
+)
+from sklearn.preprocessing._polynomial import PolynomialFeatures, SplineTransformer
+from sklearn.preprocessing._target_encoder import TargetEncoder
+
+__all__ = [
+    &quot;Binarizer&quot;,
+    &quot;FunctionTransformer&quot;,</pre><pre>sklearn.preprocessing:6-25
+from sklearn.preprocessing._data import (
+    Binarizer,
+    KernelCenterer,
+    MaxAbsScaler,
+    MinMaxScaler,
+    Normalizer,
+    PowerTransformer,
+    QuantileTransformer,
+    RobustScaler,
+    StandardScaler,
+    add_dummy_feature,
+    binarize,
+    maxabs_scale,
+    minmax_scale,
+    normalize,
+    power_transform,
+    quantile_transform,
+    robust_scale,
+    scale,
+)</pre></details><details><summary>graph — odhalit důkazy</summary><p>Úplné: True • recall 1.0 • 1030 B</p><pre>sklearn.feature_extraction.text:28-28
+from sklearn.preprocessing import normalize</pre><pre>sklearn.preprocessing:6-25
+from sklearn.preprocessing._data import (
+    Binarizer,
+    KernelCenterer,
+    MaxAbsScaler,
+    MinMaxScaler,
+    Normalizer,
+    PowerTransformer,
+    QuantileTransformer,
+    RobustScaler,
+    StandardScaler,
+    add_dummy_feature,
+    binarize,
+    maxabs_scale,
+    minmax_scale,
+    normalize,
+    power_transform,
+    quantile_transform,
+    robust_scale,
+    scale,
+)</pre><pre>sklearn.preprocessing._data:1961-1976
+def normalize(X, norm=&quot;l2&quot;, *, axis=1, copy=True, return_norm=False):
+    &quot;&quot;&quot;Scale input vectors individually to unit norm (vector length).
+
+    Read more in the :ref:`User Guide &lt;preprocessing_normalization&gt;`.
+
+    Parameters
+    ----------
+    X : {array-like, sparse matrix} of shape (n_samples, n_features)
+        The data to normalize, element by element.
+        scipy.sparse matrices should be in CSR format to avoid an
+        un-necessary copy.
+
+    norm : {&#x27;l1&#x27;, &#x27;l2&#x27;, &#x27;max&#x27;}, default=&#x27;l2&#x27;
+        The norm to use to normalize each non zero sample (or each non-zero
+        feature if axis is 0).
+</pre></details><p>Jeden diagnostický dotaz, překryv chunků a důkazových fragmentů. Nejde o obecný benchmark. Grafový parser řeší pouze explicitní importy ve třech modulech; ne dynamický Python ani interpretaci otázky. Čas měří pouze vybavení již postaveného indexu.</p><p><a href="presentation.html">Zpět na prezentaci</a> · <a href="real-source-results.json">Surové výsledky</a></p></html>

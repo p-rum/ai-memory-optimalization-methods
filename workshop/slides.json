@@ -1,0 +1,138 @@
+[
+  [
+    "Paměť agenta: co uložit, co vybavit",
+    "30 minut • workshop pro vývojáře",
+    [
+      "Cíl: zvolit strukturu podle otázky a rozpočtu kontextu.",
+      "Budeme předpovídat výsledky, procházet důkazy a měnit top‑k.",
+      "Paměť zde = uložená data + pravidla zápisu + vybavení do promptu."
+    ],
+    "0–2 min: hlasování. Kde dnes držíte paměť: historie, summary, SQL, vektory, graf? Vyberte jednu zkušenost účastníka."
+  ],
+  [
+    "Tři různé rozpočty",
+    "Nezaměňujme kontext, úložiště a RAM",
+    [
+      "Kontext LLM: tokeny vybraných důkazů a instrukcí.",
+      "Úložiště: původní text + metadata + embeddingy / hrany.",
+      "RAM a latence: index, cache, retrieval, případně model.",
+      "Menší retrieval neznamená automaticky správnější odpověď."
+    ],
+    "2–4 min: ukažte cestu událost → zápis → index → retrieval → prompt. V našem měření počítáme UTF‑8 bajty, nikoli tokeny. KV cache je jiná vrstva optimalizace."
+  ],
+  [
+    "Menu struktur",
+    "Paměť není jen databáze",
+    [
+      "Okno historie: přesné nedávné události; staré informace vypadnou.",
+      "Summary: krátký přehled; při kompresi může zmizet podmínka či zdroj.",
+      "JSON / SQL: aktuální stav, preference, verze a přesné filtry.",
+      "Episody + vektory: podobné zkušenosti a neformální text.",
+      "Knowledge Graph: entity, typované vztahy, cesty a provenience."
+    ],
+    "4–6 min: preference uživatele patří do stavu, incident do epizody, závislost do vztahu. Stejný záznam lze indexovat několika způsoby. Procedurální paměť = ověřené postupy/runbooky; sémantická = fakta; epizodická = události."
+  ],
+  [
+    "Stejná data, jiné otázky",
+    "Tři provozní úlohy",
+    [
+      "A • Jak se řešil podobný connection-pool timeout?",
+      "B • Na čem svc-0 závisí a který tým eskalovat?",
+      "C • Kdo je aktuální vlastník svc-0 po migraci?",
+      "Tipněte si: vektor, graf, nebo přesný stav?"
+    ],
+    "6–8 min: dejte 30 sekund ve dvojicích. Jde o realistické, ale syntetické scénáře, nikoli záznamy skutečného incidentu. Každý typ má osm variant."
+  ],
+  [
+    "Knowledge Graph × vektorový index",
+    "Podobnost není vztah",
+    [
+      "Vektor: dotaz → podobné texty → top‑k. Přirozený text, parafráze, epizody.",
+      "Graf: entita → typované hrany → sousedé / cesty. Vazby, dopady, zdroje.",
+      "Vektor potřebuje metadata pro čas, tenant a autoritu.",
+      "Graf potřebuje extrakci, sjednocení entit a správné směry hran.",
+      "Obě varianty mohou používat stejné SQL úložiště."
+    ],
+    "8–10 min: ukažte diagram svc-0 → db-0 → team-0. Druhá hrana neobsahuje svc-0; textová podobnost nemá důvod ji vrátit. GraphRAG je širší rodina postupů, ne synonymum pro každý graf."
+  ],
+  [
+    "Živá ukázka: najdi chybějící hranu",
+    "Nejdřív tip, potom důkazy",
+    [
+      "Otevřete ukázku níže nebo demo.html.",
+      "Zvolte B a porovnejte vector s graph.",
+      "Zvolte A: samotný graf nemá vyhledávač epizod.",
+      "Skutečný kód: source-demo.html — import → reexport → normalize."
+    ],
+    "10–15 min: A 90 s, B 90 s, skutečný kód 2 min (source-demo.html); C volitelně po meetingu. U B ukažte očekávané ID i chybějící ID. C není kompletní temporal engine: aktuální stav je ručně materializovaný. Nezavádějte žádné API klíče, vše běží offline."
+  ],
+  [
+    "Jak jsme měřili",
+    "Retrieval, nikoli inteligenci agenta",
+    [
+      "48 dokumentů • 24 dotazů • top‑k = 2 • 50 opakování/dotaz.",
+      "Gold = ručně určená ID potřebných důkazů.",
+      "Úplnost = vráceny všechny gold dokumenty; recall = podíl gold.",
+      "Precision = podíl relevantních dokumentů mezi vrácenými.",
+      "Kontext = UTF‑8 bajty; čas = warm retrieval v procesu."
+    ],
+    "15–17 min: celé tělo textu je vraceno, žádné ořezávání do stejného budgetu. full má neomezený kontext. Dotazy sdílejí šablony: 24 není 24 nezávislých problémů. Latence neobsahuje LLM, síť, ingest ani klasifikaci dotazu."
+  ],
+  [
+    "Vlastní výsledky",
+    "Jeden běh; reprodukovatelné v results.json",
+    [
+      "full: úplné důkazy 24/24 · průměr 4447 B",
+      "vector: úplné důkazy 16/24 · průměr 196 B",
+      "graph: úplné důkazy 16/24 · průměr 67 B",
+      "hybrid: úplné důkazy 24/24 · průměr 175 B"
+    ],
+    "17–19 min: ukažte graf a důkazy. Hybrid vrací asi o 96 % méně bajtů než full, ale data i routování jsou idealizované. Čísla nepřenášet na produkční vector DB / graph DB. Grafové cesty jsou dictionary lookup, vektory sparse exact cosine, ne ANN."
+  ],
+  [
+    "Změňme top‑k",
+    "Více textu může pomoci, ale také zaplnit prompt",
+    [
+      "k=1: úplné důkazy 16/24 · 98 B",
+      "k=2: úplné důkazy 16/24 · 196 B",
+      "k=4: úplné důkazy 16/24 · 407 B",
+      "k=8: úplné důkazy 16/24 · 803 B"
+    ],
+    "19–21 min: před odhalením tipněte, zda k=8 opraví B. Všechny hodnoty jsou skutečně změřené nad stejnými daty. Zvyšování k není náhradou za návaznost vztahů a časové filtry."
+  ],
+  [
+    "Hybrid: oddělte text, stav a vazby",
+    "Orchestrace je část ceny",
+    [
+      "Ulož událost se source_id, entity_id, valid_from/to a autoritou.",
+      "SQL / JSON: aktuální stav; graf: vztahy; vektory: epizody.",
+      "Dotaz → intent + entity → retrieval → deduplikace → budget.",
+      "Ke každému důkazu připoj zdroj, čas a verzi.",
+      "Při konfliktu zdrojů ukaž nejistotu, nedělej tichý overwrite."
+    ],
+    "21–24 min: v našem hybridu známe intent a entity ze zadání. V produkci změřte chyby routeru, extrakce i entity resolution; graf nevymyslí chybějící hranu. Aktualizace vlastníka má uzavřít valid_to starého tvrzení, zachovat audit a invalidovat cache."
+  ],
+  [
+    "Cvičení: návrh paměti pro vašeho agenta",
+    "Dvě minuty ve dvojicích",
+    [
+      "Agent si pamatuje preference, incidenty a vlastníky služeb.",
+      "Má vracet nejvýše 1 000 tokenů důkazů.",
+      "Navrhněte zápis, retrieval a chování při změně vlastníka.",
+      "Jakým dotazem zjistíte, že návrh selhal?"
+    ],
+    "24–27 min: 2 min práce + 1 min dvě odpovědi. Očekávané řešení: preference přesný stav, incidenty epizody, vlastnictví verzované vztahy/stav. Test: historický vlastník k datu, nezáměnné identifikátory, konflikt zdrojů, tenant isolation."
+  ],
+  [
+    "Rozhodnutí a další experiment",
+    "Začněte otázkami, které agent musí zvládnout",
+    [
+      "Podobné zkušenosti → textové / vektorové hledání.",
+      "Přesná fakta a aktuální hodnoty → SQL / JSON + časové filtry.",
+      "Více vazeb a dopady → graf, pokud máte kvalitní entity a hrany.",
+      "Kombinujte jen tam, kde testy ukážou přínos.",
+      "Produkčně měřte odpovědi, tokeny, p95, ingest a cenu aktualizací."
+    ],
+    "27–30 min: 2 min otázky, 1 min závěr. Vyberte 20 skutečných dotazů vašeho týmu a porovnejte na stejném token budgetu: lexical, neural, SQL, graph a hybrid. Předem definujte gold, validitu, abstenci a náklady. Na 30 min skončete."
+  ]
+]
