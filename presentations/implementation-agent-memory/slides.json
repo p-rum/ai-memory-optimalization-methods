@@ -1,0 +1,582 @@
+[
+  {
+    "title": "Paměť implementačního agenta",
+    "sub": "Struktura dat, výběr kontextu a skutečné náklady",
+    "lead": "SQL · vektory · znalostní grafy",
+    "time": 0.5,
+    "notes": "Cílem je vybrat paměťovou architekturu pro agenta, který čte a mění kód. Pamětí zde myslíme uchovávaný a vyhledávaný kontext, nikoli RAM nebo trénování vah modelu. Přednáška má 28 minut a 2 minuty na diskusi. Příklady jsou ilustrativní, nejsou analýzou konkrétního bankovního systému."
+  },
+  {
+    "title": "Co budeme porovnávat",
+    "rows": [
+      [
+        "Část",
+        "Čas"
+      ],
+      [
+        "Paměť, SQL, vektory a grafy",
+        "8 min"
+      ],
+      [
+        "Kombinace a příklady změn v backendu",
+        "8 min"
+      ],
+      [
+        "Graphify a další nástroje",
+        "5 min"
+      ],
+      [
+        "Náklady, měření a doporučení",
+        "7 min"
+      ],
+      [
+        "Diskuse",
+        "2 min"
+      ]
+    ],
+    "time": 0.5,
+    "notes": "Do první části patří i úvod. Zaměříme se na návrh, který může fungovat v různých IDE a agentech. Důležitý je rozdíl mezi uložením dat a rozhodnutím, které informace poslat modelu."
+  },
+  {
+    "title": "Čtyři vrstvy paměti",
+    "rows": [
+      [
+        "Vrstva",
+        "Příklad",
+        "Životnost"
+      ],
+      [
+        "Pracovní kontext",
+        "Zadání, otevřené soubory, chyby",
+        "Jeden krok / běh"
+      ],
+      [
+        "Epizodická paměť",
+        "Co agent zkusil a jak dopadly testy",
+        "Úkoly a relace"
+      ],
+      [
+        "Fakta o projektu",
+        "Symboly, závislosti, schéma DB",
+        "Platnost podle commitu"
+      ],
+      [
+        "Pravidla a rozhodnutí",
+        "Konvence, ADR, omezení",
+        "Do nahrazení rozhodnutím"
+      ]
+    ],
+    "time": 1,
+    "notes": "Paměť nemusí být jeden produkt. Stav rozpracovaného úkolu potřebuje přesnou obnovu. Fakt o metodě potřebuje vazbu na konkrétní verzi kódu. Rozhodnutí má vlastní datum platnosti. Zkrácení historie je užitečné, ale shrnutí může ztratit důležitou podmínku. Ukládejme proto i odkazy na původní důkaz. Model sám vidí jen vybraný kontext, nikoli celou databázi.",
+    "sources": [
+      "https://docs.langchain.com/oss/python/concepts/memory"
+    ]
+  },
+  {
+    "title": "Agent bez strukturované paměti",
+    "left": [
+      "1  Hledá soubory a symboly",
+      "2  Opakovaně čte široký kontext",
+      "3  Odvozuje stejné vztahy",
+      "4  Při opravě znovu hledá důkazy"
+    ],
+    "right": "Cena roste s opakovaným vstupem,\npočtem kroků a opravami.",
+    "bottom": "Férový baseline už může používat grep, LSP, repo mapu, shrnutí i prompt cache.",
+    "time": 1,
+    "notes": "Nezaměňujme baseline s karikaturou, která pokaždé pošle celý repozitář. Moderní agent běžně hledá soubory a pracuje s cache. Externí paměť má hodnotu, když sníží opakované objevování nebo počet chybných pokusů. V porovnání musíme nechat stejný model, nástroje, rozpočet a stejné úlohy. Pozdější model nákladů je záměrně čtecí, s velkým kumulativním vstupem."
+  },
+  {
+    "title": "Relační databáze: přesná fakta",
+    "left": [
+      "Symbol + cesta + commit",
+      "Výsledky testů a stav úkolu",
+      "Metadata, oprávnění a platnost",
+      "JOIN a filtrování bez LLM"
+    ],
+    "right": "„Které migrace změnily\ntabulku payment?“",
+    "bottom": "PostgreSQL nebo SQLite stačí i pro počáteční seznam uzlů a hran.",
+    "time": 1.5,
+    "notes": "Obyčejná databáze je často nejlevnější základ. Tabulky mohou uchovávat symboly, jejich zdrojový rozsah, build variantu i důkazy. SQL umí přesné dotazy a rekurzivní průchody. Samotné uložení do SQL ale nezaručí pravdivost: záleží na extraktoru a aktuálnosti. Fulltext pomůže s názvy a chybovými zprávami. Nevýhodou je potřeba schématu a horší hledání parafrází bez dalších indexů."
+  },
+  {
+    "title": "Vektorový index: podobnost významu",
+    "left": [
+      "Embedding textu nebo kódu",
+      "Dotaz vrátí podobné úryvky",
+      "Filtry omezí repo, verzi a typ dat",
+      "Reranking vybere přesnější kontext"
+    ],
+    "right": "„Kde řešíme opakované\nodeslání stejného požadavku?“",
+    "bottom": "Podobnost najde kandidáta. Neprokazuje volání ani úplnost dopadů.",
+    "time": 1.5,
+    "notes": "Dotaz může najít idempotenci, i když v něm není slovo idempotency. Dělení kódu podle funkcí a tříd obvykle zachová více smyslu než slepé bloky znaků. Uložme také signaturu, cestu a commit. Přesné identifikátory kombinujme s fulltextem. Přibližný index může minout relevantní výsledek, zejména po filtrování. Aktualizace vyžaduje přepočítat změněné embeddingy a odstranit zrušené položky.",
+    "sources": [
+      "https://github.com/pgvector/pgvector",
+      "https://qdrant.tech/documentation/search/hybrid-queries/"
+    ]
+  },
+  {
+    "title": "Znalostní graf: typované vztahy",
+    "left": [
+      "Uzel: metoda, endpoint, tabulka, ADR",
+      "Hrana: volá, mapuje, čte, mění",
+      "Průchod ukáže řetězec závislostí",
+      "Každá hrana nese původ a platnost"
+    ],
+    "right": "„Co ovlivní změna\npayment.external_id?“",
+    "bottom": "Syntaktický vztah, staticky vyřešené volání a pozorovaný běh jsou různé důkazy.",
+    "time": 1,
+    "notes": "Knowledge graf je datový model, nikoli synonymum grafové databáze nebo LLM. Hrany lze získat parserem, kompilátorem, introspekcí nebo modelovým odhadem. Tree-sitter poskytuje syntaxi, ale sám neřeší celý classpath a runtime chování Springu. Statický call graph může nadhodnocovat cíle. Trace ukazuje skutečně pozorovanou cestu, ne všechny možné cesty. U každé hrany potřebujeme druh, zdroj a status vyřešení."
+  },
+  {
+    "title": "Volba struktury podle dotazu",
+    "rows": [
+      [
+        "Potřeba",
+        "První volba",
+        "Doplněk"
+      ],
+      [
+        "Přesný symbol, verze, stav",
+        "SQL / index symbolů",
+        "Fulltext"
+      ],
+      [
+        "Podobný problém nebo ADR",
+        "Vektory + fulltext",
+        "SQL filtry"
+      ],
+      [
+        "Dopady napříč komponentami",
+        "Typovaný graf",
+        "Zdrojový kód"
+      ],
+      [
+        "Obnovení rozpracované práce",
+        "Checkpoint / SQL",
+        "Stručné shrnutí"
+      ],
+      [
+        "Přehled témat dokumentace",
+        "Hierarchická shrnutí",
+        "GraphRAG"
+      ]
+    ],
+    "time": 1,
+    "notes": "Struktury se nevylučují. Jedna PostgreSQL instance může kombinovat tabulky, fulltext a pgvector. Samostatná grafová databáze se vyplatí až podle složitosti průchodů, velikosti dat a provozních potřeb. Hierarchické shrnutí zrychluje orientaci, ale finální rozhodnutí musí být dohledatelné ke zdroji.",
+    "sources": [
+      "https://github.com/pgvector/pgvector",
+      "https://microsoft.github.io/graphrag/query/overview/"
+    ]
+  },
+  {
+    "title": "Kombinovaná paměť pro backend",
+    "rows": [
+      [
+        "Fáze",
+        "Co proběhne"
+      ],
+      [
+        "Získání faktů",
+        "Build model, parser, symboly, ORM, SQL migrace"
+      ],
+      [
+        "Uložení",
+        "SQL jako evidence, vektory pro text, typované hrany"
+      ],
+      [
+        "Výběr kandidátů",
+        "Přesný dotaz nebo fulltext + sémantické hledání"
+      ],
+      [
+        "Rozšíření kontextu",
+        "Omezený průchod grafem, deduplikace, reranking"
+      ],
+      [
+        "Práce agenta",
+        "Zdrojové úryvky v rozpočtu, úprava, build a testy"
+      ]
+    ],
+    "time": 1.5,
+    "notes": "Toto je návrh architektury, nikoli funkce jednoho konkrétního produktu. Router vybere retrieval podle otázky. Nemá smysl vždy spustit všechny databáze. Na dotaz na konkrétní metodu stačí index symbolů. U změny napříč moduly rozšiřme okolí grafem. Při nulovém nebo nejistém výsledku musí agent umět přejít k původním souborům. Pro sdílený index používejme stabilní identitu symbolu a vazbu na commit."
+  },
+  {
+    "title": "Příklad 1: idempotence REST endpointu",
+    "left": [
+      "Zadání: zabránit duplicitní platbě",
+      "Vektory najdou ADR a podobné řešení",
+      "Graf dohledá service a repository",
+      "SQL vybere aktuální migrace"
+    ],
+    "right": "Výstup pro agenta:\nendpoint, transakce, unikátní klíč,\nrelevantní testy a zdroj ADR.",
+    "bottom": "Modelový Kotlin / Spring Boot projekt. Po úpravě následuje integrační test.",
+    "time": 1.5,
+    "notes": "Představme si POST /payments. Sémantické hledání najde rozhodnutí o idempotency key. Symbolový graf vede od controlleru k service a JPA repository. Databázová evidence najde unikátní index a jeho migraci. Agent musí ověřit souběh dvou požadavků, rollback i chování při opakování po timeoutu. Testovací kód se vyhledává cíleně až jako důkaz pokrytí, ne jako produkční implementace."
+  },
+  {
+    "title": "Příklad 2: změna databázového sloupce",
+    "rows": [
+      [
+        "Vazba",
+        "Důkaz",
+        "Omezení"
+      ],
+      [
+        "Flyway migrace → sloupec",
+        "SQL parser + pořadí migrací",
+        "Odlišné nasazené prostředí"
+      ],
+      [
+        "JPA atribut → sloupec",
+        "@Column + naming strategy",
+        "Implicitní názvy, konverze"
+      ],
+      [
+        "Repository → atribut",
+        "Vyřešená query / metoda",
+        "Dynamické a native SQL"
+      ],
+      [
+        "Service → repository",
+        "Typová analýza volání",
+        "Proxy, profily, reflexe"
+      ]
+    ],
+    "time": 1.5,
+    "notes": "Zadání je změnit external_id na nullable nebo upravit jeho typ. Agent potřebuje rozlišit schéma odvozené z migrací a skutečné nasazené schéma. Není správné tvrdit, že neexistuje další použití jen proto, že ho index nenašel. Dynamické SQL musí zůstat označeno jako nevyřešené. Praktický výstup obsahuje seznam známých závislostí, neznámá místa a testovací plán. Šipky v tabulce představují vazby, nikoli skutečný pořadový tok."
+  },
+  {
+    "title": "Příklad 3: paměť rozhodnutí",
+    "left": [
+      "V květnu: retry je vypnuté",
+      "V červnu: retry jen pro timeout",
+      "V říjnu: agent upravuje klienta"
+    ],
+    "right": "Vyhledat aktuální pravidlo\nspolu s důvodem a historií.",
+    "bottom": "commit, valid_from, valid_to, source a supersedes omezují použití zastaralých faktů.",
+    "time": 1,
+    "notes": "Časová paměť se hodí pro ADR, incidenty a dohodnuté výjimky. Pouhé podobnostní hledání může vrátit staré rozhodnutí, protože je textově přesnější. Musíme filtrovat platnost nebo explicitně spojit nahrazující rozhodnutí. Graphiti je příkladem nástroje pro temporální vztahy. Pro několik desítek ADR může stačit obyčejná SQL tabulka.",
+    "sources": [
+      "https://github.com/getzep/graphiti"
+    ]
+  },
+  {
+    "title": "Kvalita extrakce rozhoduje o kvalitě paměti",
+    "rows": [
+      [
+        "Riziko",
+        "Opatření"
+      ],
+      [
+        "Testy se tváří jako produkce",
+        "Source set a typ artefaktu jako povinný filtr"
+      ],
+      [
+        "Enum je centrem kvůli četnosti",
+        "Ranking podle úkolu a typu vztahu"
+      ],
+      [
+        "Konfigurace splývá s voláním",
+        "Oddělené vrstvy a explicitní typy hran"
+      ],
+      [
+        "LLM odhad vypadá jako fakt",
+        "Původ, důkaz a status resolved / inferred"
+      ],
+      [
+        "Index zaostává za kódem",
+        "Diff update, mazání, kontrola commitu"
+      ]
+    ],
+    "time": 1.5,
+    "notes": "Často používaný enum může být významný pro změnu číselníku, ale jeho degree není automaticky architektonická důležitost. Konfigurace je důležitá například pro výběr Spring profilu, jen nesmí být zaměněna za volání. Testy také nechceme zahodit: potřebujeme je v samostatném pohledu. Inkrementální aktualizace musí invalidovat i odvozené hrany sousedních symbolů a výstupy založené na změněném buildu."
+  },
+  {
+    "title": "Malý kontext s dohledatelnými důkazy",
+    "left": [
+      "Nejdříve filtr verze a oprávnění",
+      "Potom relevance a závislosti",
+      "Limity na počet hran i tokenů",
+      "Shrnutí vždy s odkazem na zdroj"
+    ],
+    "right": "Příklad rozpočtu 12 000 tokenů:\n2 000 zadání a pravidla\n7 000 kód a důkazy\n3 000 stav práce",
+    "bottom": "Ilustrativní rozpočet. Chybějící důkaz spouští další cílené čtení.",
+    "time": 1,
+    "notes": "Optimální počet tokenů není konstantní. Retrieval musí zachovat důležité signatury, kontrakty a chybová místa. Deduplikujme překrývající se úryvky. Není důvod v každém kroku vracet stejný log. Oddělme stabilní prefix pro případnou cache od dynamického výběru. Obsah dokumentů a paměti je vstupní evidence, nikoli oprávnění přepsat instrukce agenta."
+  },
+  {
+    "title": "Graphify a Aider: orientace v kódu",
+    "rows": [
+      [
+        "Nástroj",
+        "Mechanismus",
+        "Vhodné použití"
+      ],
+      [
+        "Graphify",
+        "AST graf, query / path / explain",
+        "Průzkum vztahů v repo + dokumenty"
+      ],
+      [
+        "Aider repo map",
+        "Signatury a grafový ranking v token limitu",
+        "Kompaktní orientace při editaci"
+      ]
+    ],
+    "bottom": "U obou ověřit Kotlin, přesnost vazeb, rozlišení source setů a aktualizaci na změnách.",
+    "time": 1.5,
+    "notes": "Graphify zde znamená Graphify-Labs/graphify. Aktuální README deklaruje lokální deterministický AST průchod pro kód, sémantickou fázi pro dokumenty a značky EXTRACTED a INFERRED. Tyto značky nejsou důkaz runtime volání. Aider vybírá relevantní části mapy repozitáře do tokenového rozpočtu. Nejde o plnohodnotný historický graf rozhodnutí. Toto je porovnání mechanismů podle dokumentace, nikoli vlastní benchmark.",
+    "sources": [
+      "https://github.com/Graphify-Labs/graphify",
+      "https://aider.chat/docs/repomap.html"
+    ]
+  },
+  {
+    "title": "GraphRAG, Graphiti a Mem0",
+    "rows": [
+      [
+        "Nástroj",
+        "Primární role",
+        "Hlavní kompromis"
+      ],
+      [
+        "Microsoft GraphRAG",
+        "Entity a souhrny dokumentových komunit",
+        "Indexace a globální dotazy mohou být nákladné"
+      ],
+      [
+        "Graphiti / Zep",
+        "Časové vztahy a inkrementální paměť",
+        "Extrakce, řešení entit a provoz grafu"
+      ],
+      [
+        "Mem0",
+        "Výběr a aktualizace dlouhodobých vzpomínek",
+        "Paměť konverzace neřeší sama strukturu kódu"
+      ]
+    ],
+    "time": 1.5,
+    "notes": "GraphRAG má local, global a další režimy hledání, proto nelze paušálně označit každý jeho dotaz za drahý. Graphiti uchovává časovou platnost a původ faktů a kombinuje více způsobů hledání. Zep je související produktová infrastruktura, Graphiti open-source engine. Mem0 se zaměřuje na extrakci a správu relevantních vzpomínek. Žádný z těchto mechanismů automaticky nenahradí Kotlin compiler analysis.",
+    "sources": [
+      "https://microsoft.github.io/graphrag/query/overview/",
+      "https://github.com/getzep/graphiti",
+      "https://github.com/mem0ai/mem0",
+      "https://arxiv.org/abs/2504.19413"
+    ]
+  },
+  {
+    "title": "Úložiště a framework nejsou totéž",
+    "rows": [
+      [
+        "Řešení",
+        "Co dodává",
+        "Co musíme doplnit"
+      ],
+      [
+        "PostgreSQL\n+ pgvector",
+        "Fakta, transakce, fulltext a vektory",
+        "Extrakci, routing, aktualizaci"
+      ],
+      [
+        "Qdrant",
+        "Vektorové / hybridní vyhledávání",
+        "Autoritativní fakta a analýzu kódu"
+      ],
+      [
+        "Grafová DB",
+        "Uložení vztahů a průchody",
+        "Schéma hran a kvalitní extraktor"
+      ],
+      [
+        "LangGraph",
+        "Stav a řízení workflow / paměti",
+        "Doménový index a retrieval"
+      ]
+    ],
+    "bottom": "Doporučení pro první pilot: existující PostgreSQL, index symbolů a cílené doplňky.",
+    "time": 1,
+    "notes": "Toto doporučení je architektonický úsudek pro backendový tým, ne univerzální vítězství jedné databáze. pgvector podporuje přesné i přibližné hledání. Qdrant nabízí hybridní dotazy a vícefázový retrieval. Pro složité grafové průchody lze přidat grafovou databázi až po měření. Pro malý lokální projekt může být jednodušší SQLite a souborový index.",
+    "sources": [
+      "https://github.com/pgvector/pgvector",
+      "https://qdrant.tech/documentation/search/hybrid-queries/",
+      "https://docs.langchain.com/oss/python/concepts/memory"
+    ]
+  },
+  {
+    "title": "Co říkají publikované úspory",
+    "left": [
+      "Mem0: přes 90 % tokenové úspory\nproti full-context v LOCOMO",
+      "Graphify Cloud: tvrzení o 80 %\nsnížení spotřeby tokenů"
+    ],
+    "right": "Ani jedno číslo není zárukou\núspory na implementačních\núlohách v našem repozitáři.",
+    "bottom": "Výsledky autorů / dodavatele. Odlišné úlohy, baseline a rozsah započtených nákladů.",
+    "time": 1,
+    "notes": "Mem0 paper reportuje úsporu tokenů přes 90 procent a snížení p95 latence o 91 procent proti full-context přístupu v experimentu s konverzační pamětí LOCOMO. Na snímku ponecháváme pouze tokeny, abychom nesměšovali metriky. Graphify README uvádí 80 procent pro Cloud jako dodavatelské tvrzení. Nepřenášejme ho na lokální OSS ani na Kotlin změny. Srovnatelné vlastní měření všech nástrojů zde nemáme.",
+    "sources": [
+      "https://arxiv.org/abs/2504.19413",
+      "https://github.com/Graphify-Labs/graphify"
+    ]
+  },
+  {
+    "title": "Model nákladů jednoho úkolu",
+    "lead": "C = vstup + výstup + paměť + provoz + opravy",
+    "left": [
+      "20 kroků × 75 000 vstupních tokenů",
+      "Celkem 1,50 mil. vstup / 30 tis. výstup",
+      "Modelová sazba 3 / 15 USD za mil. tokenů"
+    ],
+    "right": "Baseline bez cache\n4,50 + 0,45 = 4,95 USD",
+    "bottom": "Ilustrace, nikoli ceník nebo naměřený benchmark. Stejný model a úspěšnost.",
+    "time": 1.5,
+    "notes": "Kumulativní vstup se sčítá přes všechna volání, nejde o maximální velikost okna. Sazby 3 a 15 USD jsou zvolené modelové parametry, ne aktuální cena konkrétního modelu. Další tabulka drží výstup 30 tisíc tokenů a počet kroků fixní, aby izolovala změnu vstupu. Náklady na build a testy předpokládáme stejné. Pokud se změní, musíme připočítat rozdíl. Náklad na lidskou práci se objeví v návratnosti."
+  },
+  {
+    "title": "Model: méně tokenů není celá úspora",
+    "rows": [
+      [
+        "Varianta",
+        "Vstup mil.",
+        "Paměť USD",
+        "Celkem USD",
+        "Úspora"
+      ],
+      [
+        "Bez paměti",
+        "1,50",
+        "0,00",
+        "4,95",
+        "—"
+      ],
+      [
+        "SQL + symboly",
+        "0,75",
+        "0,10",
+        "2,80",
+        "43 %"
+      ],
+      [
+        "Vektory + filtry",
+        "0,45",
+        "0,20",
+        "2,00",
+        "60 %"
+      ],
+      [
+        "Typovaný graf",
+        "0,30",
+        "0,35",
+        "1,70",
+        "66 %"
+      ],
+      [
+        "Hybrid",
+        "0,24",
+        "0,45",
+        "1,62",
+        "67 %"
+      ]
+    ],
+    "bottom": "Modelové předpoklady. Paměť zahrnuje retrieval a aktualizace. Fixní náklady zvlášť.",
+    "time": 1.5,
+    "notes": "Výpočet je vstup v milionech krát 3 plus 0,03 krát 15 plus paměť. Například hybrid: 0,24×3 + 0,45 + 0,45 = 1,62 USD. Úspora je 1 minus náklad dělený 4,95. Pořadí není benchmark produktů ani záruka, že graf vždy porazí vektory. Pro jednoduchou opravu může být indexace dražší než grep. Částky nezahrnují jednorázové nasazení ani fixní hosting, které doplní další snímek."
+  },
+  {
+    "title": "Cache a objem práce mění návratnost",
+    "rows": [
+      [
+        "Scénář",
+        "Výsledek modelu"
+      ],
+      [
+        "Bez cache, baseline / hybrid",
+        "4,95 / 1,62 USD za úkol"
+      ],
+      [
+        "80 % vstupu z cache u obou variant",
+        "1,71 / 1,10 USD za úkol"
+      ],
+      [
+        "Vstupní investice 300 USD + fixní 60 USD",
+        "Návratnost bez cache: 109 úkolů v 1. měsíci"
+      ],
+      [
+        "Stejná investice při 80% cache",
+        "Návratnost: 592 úkolů v 1. měsíci"
+      ]
+    ],
+    "bottom": "Cache sazba 0,30 USD / mil. tokenů je modelová. Investice musí zahrnout i práci lidí.",
+    "time": 1.5,
+    "notes": "Při 80 procent cache je efektivní sazba 0,2×3 + 0,8×0,3 = 0,84 USD za milion vstupních tokenů. Baseline 1,5×0,84+0,45=1,71. Hybrid 0,24×0,84+0,45+0,45=1,1016. Úspora 0,6084. Bez cache je úspora 3,33. Body zvratu jsou ceil(360/3,33)=109 a ceil(360/0,6084)=592. Jde o první měsíc. Obecně N>(počáteční investice + fixní náklad období)/(baseline−varianta). Pokud jmenovatel není kladný, návratnost neexistuje. Reálná implementace může stát násobně více než modelových 300 USD."
+  },
+  {
+    "title": "Ověření na implementačních úlohách",
+    "left": [
+      "30–50 reprezentativních úkolů",
+      "Stejný commit, model a pravidla",
+      "Studený i aktualizovaný index",
+      "Více opakování a zaslepené review"
+    ],
+    "right": "Hlavní metrika:\ncelková cena za přijatou změnu",
+    "bottom": "Navíc: úspěšnost, čas, opravy, retrieval recall a podíl zastaralých důkazů.",
+    "time": 1.5,
+    "notes": "Úlohy rozdělme na lokální opravy, změny přes moduly, DB změny a rozhodování podle dokumentace. Měřme A bez paměti, B SQL a symboly, C s vektory a D s grafem. Cost per accepted change počítejme jako celkové náklady všech pokusů dělené počtem přijatých změn, včetně neúspěšných běhů a ceny indexace. Hlásíme medián, p95 i variabilitu a změnu úspěšnosti. Kritérium pilotu může být úspora alespoň 20 procent bez významného zhoršení kvality, ale je to navržená brána, nikoli výsledek."
+  },
+  {
+    "title": "Doporučený postup pro tým",
+    "left": [
+      "1  Symboly, metadata a měření baseline",
+      "2  Fulltext + vektory pro ADR a dokumenty",
+      "3  Typované hrany pro dopady změn",
+      "4  Časová paměť pro dlouhé workflow"
+    ],
+    "right": "Přidat další vrstvu až tehdy,\nkdyž řeší konkrétní měřenou ztrátu.",
+    "bottom": "Výklad 28 minut. Diskuse 2 minuty: kde dnes agent opakovaně objevuje stejné informace?",
+    "time": 1,
+    "notes": "Pro Kotlin a Spring má vysokou hodnotu kvalitní build model, source sety, symbol resolution a transparentní nevyřešené hrany. Graphify lze pilotovat pro navigaci, GraphRAG pro rozsáhlé dokumenty a Graphiti nebo Mem0 pro časovou či epizodickou paměť. Nemusíme nasadit všechny. Ptejte se publika, zda největší ztráta vzniká při hledání kódu, při dopadech změn nebo při zapomínání rozhodnutí. Diskuse má rezervované dvě minuty navíc."
+  },
+  {
+    "title": "Příloha: návrh minimálního záznamu",
+    "rows": [
+      [
+        "Pole",
+        "Příklad"
+      ],
+      [
+        "identity",
+        "repo + commit + symbol_id"
+      ],
+      [
+        "classification",
+        "production / test / config / generated"
+      ],
+      [
+        "evidence",
+        "path + řádky + content_hash + extractor"
+      ],
+      [
+        "relation",
+        "calls / maps_to / alters / supersedes"
+      ],
+      [
+        "validity",
+        "valid_from + valid_to + resolution_status"
+      ]
+    ],
+    "bottom": "Návrh schématu. Nejde o existující API konkrétního nástroje.",
+    "time": 0,
+    "notes": "Společná identita propojí SQL, embedding a graf. U patchů kontrolujme commit i hash zdroje. Inkrementální aktualizace musí odstranit zaniklé symboly a odvozené vztahy. Pro multirepo doplňme vazbu mezi verzemi závislostí. Runtime důkaz přidejme s prostředím a časem pozorování."
+  },
+  {
+    "title": "Příloha: zdroje a metodika",
+    "left": [
+      "Graphify-Labs/graphify · README",
+      "Aider · Repository map",
+      "Microsoft GraphRAG · Query overview",
+      "getzep/graphiti · README"
+    ],
+    "right": "pgvector · README\nQdrant · Hybrid queries\nLangChain · Memory overview\nMem0 · arXiv:2504.19413",
+    "bottom": "Zdroje ověřeny 13. 10. 2026. Přímé odkazy jsou v poznámkách příslušných snímků.",
+    "time": 0,
+    "notes": "Veškeré porovnání nástrojů vychází z jejich primární dokumentace, nikoli ze spuštění na vlastním repozitáři. Nákladový model, SQL/grafové schéma a backendové scénáře jsou autorské ilustrace. Čísla úspor Mem0 a Graphify jsou tvrzení autorů či dodavatele a mají rozdílný rozsah. Odkazy: https://github.com/Graphify-Labs/graphify ; https://aider.chat/docs/repomap.html ; https://microsoft.github.io/graphrag/query/overview/ ; https://github.com/getzep/graphiti ; https://github.com/pgvector/pgvector ; https://qdrant.tech/documentation/search/hybrid-queries/ ; https://docs.langchain.com/oss/python/concepts/memory ; https://arxiv.org/abs/2504.19413"
+  }
+]
