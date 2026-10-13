@@ -1,0 +1,5 @@
+[
+  {"id":"health-v1","status":"deployed","valid_from":"2026-01-01","valid_to":"2026-10-01","weights":{"liquidity":0.6,"margin":0.4,"diversification":0.0},"source":"demo deployment registry: retired version"},
+  {"id":"health-v2","status":"deployed","valid_from":"2026-10-01","valid_to":null,"weights":{"liquidity":0.5,"margin":0.3,"diversification":0.2},"source":"demo deployment registry: current version"},
+  {"id":"health-v3-draft","status":"draft","valid_from":"2026-11-01","valid_to":null,"weights":{"liquidity":0.2,"margin":0.6,"diversification":0.2},"source":"demo proposal: NOT deployed"}
+]

@@ -46,7 +46,7 @@ Měřeno 12. 10. 2026 v připojeném prostředí. Scénáře napodobují reálno
 
 Hybrid zde snižuje vrácený kontext z 4 447 na 175 B (přibližně 96 %) při úplných důkazech 24/24. To podporuje názornou myšlenku směrování podle otázky; **neprokazuje nadřazenost architektury v produkci**. Graf má proti vektorům navíc kurátorované struktury a známé entity. Extrakce i údržba mají cenu a chyby, které zde neměříme.
 
-U dvoukrokové úlohy text druhé hrany neobsahuje jméno služby. Vektorové hledání proto typicky vrátí první hranu a jiný text se stejnou službou. Samotný graf zde nedokáže najít podobnou epizodu. Aktuální stav lze efektivně řešit SQL/JSON; není důvod vyžadovat grafovou DB.
+U dvoukrokové úlohy text druhé hrany neobsahuje jméno služby. V našem konkrétním referenčním dotazu q-path-0 vektorové hledání vrací own-1 a own-2: záznamy nesprávných databázových týmů. Potřebné jsou dep-0 a own-0. Bez explicitního průchodu se nepokryje příslušná dvojice vztahů; přesná vrácená ID jsou v JSON. Samotný graf zde nedokáže najít podobnou epizodu. Aktuální stav lze efektivně řešit SQL/JSON; není důvod vyžadovat grafovou DB.
 
 ## Co zlepšit pro rozhodnutí týmu
 

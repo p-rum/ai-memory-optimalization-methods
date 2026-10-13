@@ -1,5 +1,7 @@
 # Tahák: struktury paměti LLM agenta
 
+Pro vysvětlení pojmů běžnou řečí a text k přednesu začněte [průvodcem moderátora](facilitator.md). Tento tahák je doplněk pro vývojáře po meetingu.
+
 Paměť navrhujte ve třech krocích: **co zapisovat → jak vybavovat → co poslat modelu**. Znalost v databázi nepomůže, pokud se nenajde, nevejde do promptu nebo nemá jasnou platnost.
 
 | Struktura | Vhodné otázky | Výhoda | Typické selhání | Kontrola |
@@ -80,3 +82,7 @@ Primární technické reference pro navazující experimenty (nejde o zdroj naš
 - Vektorové indexy a exact/approximate retrieval: https://github.com/pgvector/pgvector
 - Typy a práce s grafovými vztahy: https://neo4j.com/docs/getting-started/appendix/graphdb-concepts/
 - Lost in the Middle (pozice důkazů v kontextu): https://arxiv.org/abs/2307.03172
+
+## Konkrétní nástroje
+
+[Graphify a šest dalších nástrojů](tools-comparison.md) porovnává kódovou paměť, časová fakta, session a dokumentový RAG. [Interaktivní tabulka](tools-comparison.html) umožní zvolit dvojici. Jde o porovnání podle dokumentace; dosavadní vlastní benchmarky produkty nespouštějí. Pro pilot repozitáře začněte dvojicí Graphify/GitNexus, pro historickou platnost zvažte Graphiti a SQL baseline.

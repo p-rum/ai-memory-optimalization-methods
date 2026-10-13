@@ -1,0 +1,7 @@
+[
+ {"id":"doc-weekly-report","text":"Týdenní report platformy pro obchodníky na burze ukazuje PnL a finanční zdraví klienta. Přehled má odpovídat na otázku: odkud se berou data pro týdenní report? Toto je uživatelský popis, nikoli úplný seznam datových zdrojů."},
+ {"id":"doc-feature-proposal","text":"Nová feature what-if margin umožní obchodníkovi odhadnout finanční zdraví klienta při změně maržových požadavků. Které části kódu ovlivní přidání feature? Před změnou calculate_margin_buffer potřebujeme analýzu dopadů. Tento návrh sám neobsahuje seznam všech volajících funkcí."},
+ {"id":"doc-health-old","text":"Finanční zdraví klienta: starší mechanismus health-v1 používá 60 % likvidity a 40 % maržové rezervy. Platnost skončila 1. 10. 2026. Nejde o současný mechanismus výpočtu finančního zdraví klienta."},
+ {"id":"doc-health-draft","text":"Současný mechanismus výpočtu finančního zdraví klienta: návrh health-v3-draft by používal 20 % likvidity a 60 % maržové rezervy a 20 % diverzifikace. Stav DRAFT, není nasazený. Název dokumentu není důkaz aktuální produkční platnosti."},
+ {"id":"doc-timeout","text":"Podobný incident podpůrné platformy: týdenní report timeout při vyčerpání připojení do zdroje tržních dat. Ověřené řešení v modelovém scénáři: omezit souběžné požadavky a zavést backpressure."}
+]

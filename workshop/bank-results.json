@@ -1,0 +1,1232 @@
+{
+  "metadata": {
+    "date": "2026-10-13",
+    "python": "3.12.14",
+    "documents": 29,
+    "queries": 3,
+    "repetitions": 50,
+    "vector_build_ms": 2.195384999140515,
+    "scope": "Synthetic banking code, actual AST extraction and execution. Known start symbols and intent. structure=current is registry + graph, not graph alone. No LLM, no product benchmark. Bytes not tokens."
+  },
+  "documents": [
+    {
+      "id": "fn:api.get_trader_dashboard",
+      "text": "def get_trader_dashboard():\n    version = deployed_mechanism()\n    return {'client': 'DEMO-001', 'health': calculate_financial_health(version['weights']), 'version': version['id']}",
+      "kind": "code",
+      "label": "get_trader_dashboard",
+      "source": "bank_demo/api.py:5-7",
+      "module": "api"
+    },
+    {
+      "id": "fn:health.calculate_liquidity_component",
+      "text": "def calculate_liquidity_component(cash, outflows):\n    if outflows <= 0:\n        raise ValueError('outflows must be positive')\n    return max(0.0, min(1.0, cash / outflows / 2.0))",
+      "kind": "code",
+      "label": "calculate_liquidity_component",
+      "source": "bank_demo/health.py:4-7",
+      "module": "health"
+    },
+    {
+      "id": "fn:health.calculate_margin_buffer",
+      "text": "def calculate_margin_buffer(equity, initial_margin):\n    if equity <= 0:\n        raise ValueError('equity must be positive')\n    return max(0.0, min(1.0, ((equity - initial_margin) / equity) / 0.5))",
+      "kind": "code",
+      "label": "calculate_margin_buffer",
+      "source": "bank_demo/health.py:9-12",
+      "module": "health"
+    },
+    {
+      "id": "fn:health.calculate_diversification",
+      "text": "def calculate_diversification(largest_position_share):\n    if not 0.0 <= largest_position_share <= 1.0:\n        raise ValueError('share must be between 0 and 1')\n    return 1.0 - largest_position_share",
+      "kind": "code",
+      "label": "calculate_diversification",
+      "source": "bank_demo/health.py:14-17",
+      "module": "health"
+    },
+    {
+      "id": "fn:health.calculate_financial_health",
+      "text": "def calculate_financial_health(weights):\n    cashflows = load_cashflows()\n    margins = load_margin_snapshot()\n    position = load_positions()\n    liquidity = calculate_liquidity_component(cashflows['available_cash'], cashflows['next_week_outflows'])\n    margin = calculate_margin_buffer(margins['equity'], margins['initial_margin'])\n    diversification = calculate_diversification(position['largest_position_share'])\n    score = 100.0 * (weights['liquidity'] * liquidity + weights['margin'] * margin + weights['diversification'] * diversification)\n    return {'score': round(score, 2), 'components': {'liquidity': liquidity, 'margin': margin, 'diversification': diversification}}",
+      "kind": "code",
+      "label": "calculate_financial_health",
+      "source": "bank_demo/health.py:19-27",
+      "module": "health"
+    },
+    {
+      "id": "fn:pnl.calculate_weekly_pnl",
+      "text": "def calculate_weekly_pnl():\n    position = load_positions()\n    prices = load_closing_prices()[position['symbol']]\n    fx = load_fx_rates()['USD_EUR']\n    return round(position['quantity'] * (prices['week_end'] - prices['week_start']) * fx, 2)",
+      "kind": "code",
+      "label": "calculate_weekly_pnl",
+      "source": "bank_demo/pnl.py:4-8",
+      "module": "pnl"
+    },
+    {
+      "id": "fn:registry.deployed_mechanism",
+      "text": "def deployed_mechanism(as_of='2026-10-13'):\n    versions = json.loads(Path(__file__).with_name('mechanisms.json').read_text())\n    matches = [v for v in versions if v['status'] == 'deployed' and v['valid_from'] <= as_of and (v['valid_to'] is None or as_of < v['valid_to'])]\n    if len(matches) != 1:\n        raise ValueError('no unique deployed version')\n    return matches[0]",
+      "kind": "code",
+      "label": "deployed_mechanism",
+      "source": "bank_demo/registry.py:5-10",
+      "module": "registry"
+    },
+    {
+      "id": "fn:report.generate_weekly_report",
+      "text": "def generate_weekly_report():\n    profile = load_client_profile()\n    mechanism = deployed_mechanism()\n    return {'client': profile['client_id'], 'currency': profile['report_currency'], 'weekly_pnl': calculate_weekly_pnl(), 'financial_health': calculate_financial_health(mechanism['weights']), 'mechanism_version': mechanism['id']}",
+      "kind": "code",
+      "label": "generate_weekly_report",
+      "source": "bank_demo/report.py:7-10",
+      "module": "report"
+    },
+    {
+      "id": "fn:sources.source",
+      "text": "def source(name):\n    def decorator(fn):\n        fn.source_name = name\n        return fn\n    return decorator",
+      "kind": "code",
+      "label": "source",
+      "source": "bank_demo/sources.py:2-6",
+      "module": "sources"
+    },
+    {
+      "id": "fn:sources.load_positions",
+      "text": "@source('portfolio_positions')\ndef load_positions():\n    return {'symbol': 'AAPL', 'quantity': 100, 'largest_position_share': 0.60}",
+      "kind": "code",
+      "label": "load_positions",
+      "source": "bank_demo/sources.py:8-10",
+      "module": "sources"
+    },
+    {
+      "id": "data:portfolio_positions",
+      "text": "Datový zdroj portfolio_positions. V modelové platformě ho poskytuje load_positions; zdrojová deklarace bank_demo/sources.py:8-10.",
+      "kind": "dataset",
+      "label": "portfolio_positions",
+      "source": "bank_demo/sources.py:8-10"
+    },
+    {
+      "id": "fn:sources.load_closing_prices",
+      "text": "@source('market_closing_prices')\ndef load_closing_prices():\n    return {'AAPL': {'week_start': 150.0, 'week_end': 155.0}}",
+      "kind": "code",
+      "label": "load_closing_prices",
+      "source": "bank_demo/sources.py:12-14",
+      "module": "sources"
+    },
+    {
+      "id": "data:market_closing_prices",
+      "text": "Datový zdroj market_closing_prices. V modelové platformě ho poskytuje load_closing_prices; zdrojová deklarace bank_demo/sources.py:12-14.",
+      "kind": "dataset",
+      "label": "market_closing_prices",
+      "source": "bank_demo/sources.py:12-14"
+    },
+    {
+      "id": "fn:sources.load_fx_rates",
+      "text": "@source('reference_fx_rates')\ndef load_fx_rates():\n    return {'USD_EUR': 0.92}",
+      "kind": "code",
+      "label": "load_fx_rates",
+      "source": "bank_demo/sources.py:16-18",
+      "module": "sources"
+    },
+    {
+      "id": "data:reference_fx_rates",
+      "text": "Datový zdroj reference_fx_rates. V modelové platformě ho poskytuje load_fx_rates; zdrojová deklarace bank_demo/sources.py:16-18.",
+      "kind": "dataset",
+      "label": "reference_fx_rates",
+      "source": "bank_demo/sources.py:16-18"
+    },
+    {
+      "id": "fn:sources.load_cashflows",
+      "text": "@source('client_cashflows')\ndef load_cashflows():\n    return {'available_cash': 20000.0, 'next_week_outflows': 30000.0}",
+      "kind": "code",
+      "label": "load_cashflows",
+      "source": "bank_demo/sources.py:20-22",
+      "module": "sources"
+    },
+    {
+      "id": "data:client_cashflows",
+      "text": "Datový zdroj client_cashflows. V modelové platformě ho poskytuje load_cashflows; zdrojová deklarace bank_demo/sources.py:20-22.",
+      "kind": "dataset",
+      "label": "client_cashflows",
+      "source": "bank_demo/sources.py:20-22"
+    },
+    {
+      "id": "fn:sources.load_margin_snapshot",
+      "text": "@source('margin_snapshots')\ndef load_margin_snapshot():\n    return {'equity': 100000.0, 'initial_margin': 50000.0}",
+      "kind": "code",
+      "label": "load_margin_snapshot",
+      "source": "bank_demo/sources.py:24-26",
+      "module": "sources"
+    },
+    {
+      "id": "data:margin_snapshots",
+      "text": "Datový zdroj margin_snapshots. V modelové platformě ho poskytuje load_margin_snapshot; zdrojová deklarace bank_demo/sources.py:24-26.",
+      "kind": "dataset",
+      "label": "margin_snapshots",
+      "source": "bank_demo/sources.py:24-26"
+    },
+    {
+      "id": "fn:sources.load_client_profile",
+      "text": "@source('client_profiles')\ndef load_client_profile():\n    return {'client_id': 'DEMO-001', 'report_currency': 'EUR'}",
+      "kind": "code",
+      "label": "load_client_profile",
+      "source": "bank_demo/sources.py:28-30",
+      "module": "sources"
+    },
+    {
+      "id": "data:client_profiles",
+      "text": "Datový zdroj client_profiles. V modelové platformě ho poskytuje load_client_profile; zdrojová deklarace bank_demo/sources.py:28-30.",
+      "kind": "dataset",
+      "label": "client_profiles",
+      "source": "bank_demo/sources.py:28-30"
+    },
+    {
+      "id": "cfg:health-v1",
+      "text": "{\"id\": \"health-v1\", \"status\": \"deployed\", \"valid_from\": \"2026-01-01\", \"valid_to\": \"2026-10-01\", \"weights\": {\"liquidity\": 0.6, \"margin\": 0.4, \"diversification\": 0.0}, \"source\": \"demo deployment registry: retired version\"}",
+      "kind": "config",
+      "label": "health-v1",
+      "source": "bank_demo/mechanisms.json"
+    },
+    {
+      "id": "cfg:health-v2",
+      "text": "{\"id\": \"health-v2\", \"status\": \"deployed\", \"valid_from\": \"2026-10-01\", \"valid_to\": null, \"weights\": {\"liquidity\": 0.5, \"margin\": 0.3, \"diversification\": 0.2}, \"source\": \"demo deployment registry: current version\"}",
+      "kind": "config",
+      "label": "health-v2",
+      "source": "bank_demo/mechanisms.json"
+    },
+    {
+      "id": "cfg:health-v3-draft",
+      "text": "{\"id\": \"health-v3-draft\", \"status\": \"draft\", \"valid_from\": \"2026-11-01\", \"valid_to\": null, \"weights\": {\"liquidity\": 0.2, \"margin\": 0.6, \"diversification\": 0.2}, \"source\": \"demo proposal: NOT deployed\"}",
+      "kind": "config",
+      "label": "health-v3-draft",
+      "source": "bank_demo/mechanisms.json"
+    },
+    {
+      "id": "doc-weekly-report",
+      "text": "Týdenní report platformy pro obchodníky na burze ukazuje PnL a finanční zdraví klienta. Přehled má odpovídat na otázku: odkud se berou data pro týdenní report? Toto je uživatelský popis, nikoli úplný seznam datových zdrojů.",
+      "kind": "document",
+      "label": "doc-weekly-report",
+      "source": "bank_demo/notes.json"
+    },
+    {
+      "id": "doc-feature-proposal",
+      "text": "Nová feature what-if margin umožní obchodníkovi odhadnout finanční zdraví klienta při změně maržových požadavků. Které části kódu ovlivní přidání feature? Před změnou calculate_margin_buffer potřebujeme analýzu dopadů. Tento návrh sám neobsahuje seznam všech volajících funkcí.",
+      "kind": "document",
+      "label": "doc-feature-proposal",
+      "source": "bank_demo/notes.json"
+    },
+    {
+      "id": "doc-health-old",
+      "text": "Finanční zdraví klienta: starší mechanismus health-v1 používá 60 % likvidity a 40 % maržové rezervy. Platnost skončila 1. 10. 2026. Nejde o současný mechanismus výpočtu finančního zdraví klienta.",
+      "kind": "document",
+      "label": "doc-health-old",
+      "source": "bank_demo/notes.json"
+    },
+    {
+      "id": "doc-health-draft",
+      "text": "Současný mechanismus výpočtu finančního zdraví klienta: návrh health-v3-draft by používal 20 % likvidity a 60 % maržové rezervy a 20 % diverzifikace. Stav DRAFT, není nasazený. Název dokumentu není důkaz aktuální produkční platnosti.",
+      "kind": "document",
+      "label": "doc-health-draft",
+      "source": "bank_demo/notes.json"
+    },
+    {
+      "id": "doc-timeout",
+      "text": "Podobný incident podpůrné platformy: týdenní report timeout při vyčerpání připojení do zdroje tržních dat. Ověřené řešení v modelovém scénáři: omezit souběžné požadavky a zavést backpressure.",
+      "kind": "document",
+      "label": "doc-timeout",
+      "source": "bank_demo/notes.json"
+    }
+  ],
+  "edges": [
+    {
+      "source": "fn:sources.load_positions",
+      "target": "data:portfolio_positions",
+      "type": "reads",
+      "evidence": "bank_demo/sources.py:8-10"
+    },
+    {
+      "source": "fn:sources.load_closing_prices",
+      "target": "data:market_closing_prices",
+      "type": "reads",
+      "evidence": "bank_demo/sources.py:12-14"
+    },
+    {
+      "source": "fn:sources.load_fx_rates",
+      "target": "data:reference_fx_rates",
+      "type": "reads",
+      "evidence": "bank_demo/sources.py:16-18"
+    },
+    {
+      "source": "fn:sources.load_cashflows",
+      "target": "data:client_cashflows",
+      "type": "reads",
+      "evidence": "bank_demo/sources.py:20-22"
+    },
+    {
+      "source": "fn:sources.load_margin_snapshot",
+      "target": "data:margin_snapshots",
+      "type": "reads",
+      "evidence": "bank_demo/sources.py:24-26"
+    },
+    {
+      "source": "fn:sources.load_client_profile",
+      "target": "data:client_profiles",
+      "type": "reads",
+      "evidence": "bank_demo/sources.py:28-30"
+    },
+    {
+      "source": "fn:api.get_trader_dashboard",
+      "target": "fn:registry.deployed_mechanism",
+      "type": "calls",
+      "evidence": "bank_demo/api.py:5-7"
+    },
+    {
+      "source": "fn:api.get_trader_dashboard",
+      "target": "fn:health.calculate_financial_health",
+      "type": "calls",
+      "evidence": "bank_demo/api.py:5-7"
+    },
+    {
+      "source": "fn:health.calculate_financial_health",
+      "target": "fn:sources.load_cashflows",
+      "type": "calls",
+      "evidence": "bank_demo/health.py:19-27"
+    },
+    {
+      "source": "fn:health.calculate_financial_health",
+      "target": "fn:sources.load_margin_snapshot",
+      "type": "calls",
+      "evidence": "bank_demo/health.py:19-27"
+    },
+    {
+      "source": "fn:health.calculate_financial_health",
+      "target": "fn:sources.load_positions",
+      "type": "calls",
+      "evidence": "bank_demo/health.py:19-27"
+    },
+    {
+      "source": "fn:health.calculate_financial_health",
+      "target": "fn:health.calculate_liquidity_component",
+      "type": "calls",
+      "evidence": "bank_demo/health.py:19-27"
+    },
+    {
+      "source": "fn:health.calculate_financial_health",
+      "target": "fn:health.calculate_margin_buffer",
+      "type": "calls",
+      "evidence": "bank_demo/health.py:19-27"
+    },
+    {
+      "source": "fn:health.calculate_financial_health",
+      "target": "fn:health.calculate_diversification",
+      "type": "calls",
+      "evidence": "bank_demo/health.py:19-27"
+    },
+    {
+      "source": "fn:pnl.calculate_weekly_pnl",
+      "target": "fn:sources.load_positions",
+      "type": "calls",
+      "evidence": "bank_demo/pnl.py:4-8"
+    },
+    {
+      "source": "fn:pnl.calculate_weekly_pnl",
+      "target": "fn:sources.load_closing_prices",
+      "type": "calls",
+      "evidence": "bank_demo/pnl.py:4-8"
+    },
+    {
+      "source": "fn:pnl.calculate_weekly_pnl",
+      "target": "fn:sources.load_fx_rates",
+      "type": "calls",
+      "evidence": "bank_demo/pnl.py:4-8"
+    },
+    {
+      "source": "fn:report.generate_weekly_report",
+      "target": "fn:sources.load_client_profile",
+      "type": "calls",
+      "evidence": "bank_demo/report.py:7-10"
+    },
+    {
+      "source": "fn:report.generate_weekly_report",
+      "target": "fn:registry.deployed_mechanism",
+      "type": "calls",
+      "evidence": "bank_demo/report.py:7-10"
+    },
+    {
+      "source": "fn:report.generate_weekly_report",
+      "target": "fn:pnl.calculate_weekly_pnl",
+      "type": "calls",
+      "evidence": "bank_demo/report.py:7-10"
+    },
+    {
+      "source": "fn:report.generate_weekly_report",
+      "target": "fn:health.calculate_financial_health",
+      "type": "calls",
+      "evidence": "bank_demo/report.py:7-10"
+    },
+    {
+      "source": "fn:sources.load_positions",
+      "target": "fn:sources.source",
+      "type": "calls",
+      "evidence": "bank_demo/sources.py:8-10"
+    },
+    {
+      "source": "fn:sources.load_closing_prices",
+      "target": "fn:sources.source",
+      "type": "calls",
+      "evidence": "bank_demo/sources.py:12-14"
+    },
+    {
+      "source": "fn:sources.load_fx_rates",
+      "target": "fn:sources.source",
+      "type": "calls",
+      "evidence": "bank_demo/sources.py:16-18"
+    },
+    {
+      "source": "fn:sources.load_cashflows",
+      "target": "fn:sources.source",
+      "type": "calls",
+      "evidence": "bank_demo/sources.py:20-22"
+    },
+    {
+      "source": "fn:sources.load_margin_snapshot",
+      "target": "fn:sources.source",
+      "type": "calls",
+      "evidence": "bank_demo/sources.py:24-26"
+    },
+    {
+      "source": "fn:sources.load_client_profile",
+      "target": "fn:sources.source",
+      "type": "calls",
+      "evidence": "bank_demo/sources.py:28-30"
+    }
+  ],
+  "queries": [
+    {
+      "id": "bank-report",
+      "type": "lineage",
+      "title": "Odkud se berou data pro týdenní report?",
+      "text": "Odkud se berou data pro týdenní report platformy pro obchodníky na burze?",
+      "start": "fn:report.generate_weekly_report",
+      "gold": [
+        "fn:report.generate_weekly_report",
+        "fn:pnl.calculate_weekly_pnl",
+        "fn:health.calculate_financial_health",
+        "data:portfolio_positions",
+        "data:market_closing_prices",
+        "data:reference_fx_rates",
+        "data:client_cashflows",
+        "data:margin_snapshots",
+        "data:client_profiles"
+      ]
+    },
+    {
+      "id": "bank-feature",
+      "type": "impact",
+      "title": "Co ovlivní feature what-if margin?",
+      "text": "Které části kódu ovlivní změna calculate_margin_buffer kvůli přidání nové feature what-if margin?",
+      "start": "fn:health.calculate_margin_buffer",
+      "gold": [
+        "fn:health.calculate_financial_health",
+        "fn:report.generate_weekly_report",
+        "fn:api.get_trader_dashboard"
+      ]
+    },
+    {
+      "id": "bank-health",
+      "type": "current",
+      "title": "Jak se dnes počítá finanční zdraví klienta?",
+      "text": "Jaký je současný mechanismus výpočtu finančního zdraví klienta?",
+      "start": "fn:health.calculate_financial_health",
+      "gold": [
+        "cfg:health-v2",
+        "fn:registry.deployed_mechanism",
+        "fn:health.calculate_financial_health",
+        "fn:health.calculate_liquidity_component",
+        "fn:health.calculate_margin_buffer",
+        "fn:health.calculate_diversification"
+      ]
+    }
+  ],
+  "rankings": {
+    "bank-report": [
+      {
+        "id": "doc-weekly-report",
+        "score": 0.7053639522035484,
+        "rank": 1
+      },
+      {
+        "id": "doc-timeout",
+        "score": 0.1353853397574084,
+        "rank": 2
+      },
+      {
+        "id": "fn:api.get_trader_dashboard",
+        "score": 0.0,
+        "rank": 3
+      },
+      {
+        "id": "fn:health.calculate_liquidity_component",
+        "score": 0.0,
+        "rank": 4
+      },
+      {
+        "id": "fn:health.calculate_margin_buffer",
+        "score": 0.0,
+        "rank": 5
+      },
+      {
+        "id": "fn:health.calculate_diversification",
+        "score": 0.0,
+        "rank": 6
+      },
+      {
+        "id": "fn:health.calculate_financial_health",
+        "score": 0.0,
+        "rank": 7
+      },
+      {
+        "id": "fn:pnl.calculate_weekly_pnl",
+        "score": 0.0,
+        "rank": 8
+      },
+      {
+        "id": "fn:registry.deployed_mechanism",
+        "score": 0.0,
+        "rank": 9
+      },
+      {
+        "id": "fn:report.generate_weekly_report",
+        "score": 0.0,
+        "rank": 10
+      },
+      {
+        "id": "fn:sources.source",
+        "score": 0.0,
+        "rank": 11
+      },
+      {
+        "id": "fn:sources.load_positions",
+        "score": 0.0,
+        "rank": 12
+      },
+      {
+        "id": "data:portfolio_positions",
+        "score": 0.0,
+        "rank": 13
+      },
+      {
+        "id": "fn:sources.load_closing_prices",
+        "score": 0.0,
+        "rank": 14
+      },
+      {
+        "id": "data:market_closing_prices",
+        "score": 0.0,
+        "rank": 15
+      },
+      {
+        "id": "fn:sources.load_fx_rates",
+        "score": 0.0,
+        "rank": 16
+      },
+      {
+        "id": "data:reference_fx_rates",
+        "score": 0.0,
+        "rank": 17
+      },
+      {
+        "id": "fn:sources.load_cashflows",
+        "score": 0.0,
+        "rank": 18
+      },
+      {
+        "id": "data:client_cashflows",
+        "score": 0.0,
+        "rank": 19
+      },
+      {
+        "id": "fn:sources.load_margin_snapshot",
+        "score": 0.0,
+        "rank": 20
+      },
+      {
+        "id": "data:margin_snapshots",
+        "score": 0.0,
+        "rank": 21
+      },
+      {
+        "id": "fn:sources.load_client_profile",
+        "score": 0.0,
+        "rank": 22
+      },
+      {
+        "id": "data:client_profiles",
+        "score": 0.0,
+        "rank": 23
+      },
+      {
+        "id": "cfg:health-v1",
+        "score": 0.0,
+        "rank": 24
+      },
+      {
+        "id": "cfg:health-v2",
+        "score": 0.0,
+        "rank": 25
+      },
+      {
+        "id": "cfg:health-v3-draft",
+        "score": 0.0,
+        "rank": 26
+      },
+      {
+        "id": "doc-feature-proposal",
+        "score": 0.0,
+        "rank": 27
+      },
+      {
+        "id": "doc-health-old",
+        "score": 0.0,
+        "rank": 28
+      },
+      {
+        "id": "doc-health-draft",
+        "score": 0.0,
+        "rank": 29
+      }
+    ],
+    "bank-feature": [
+      {
+        "id": "doc-feature-proposal",
+        "score": 0.5553288826693134,
+        "rank": 1
+      },
+      {
+        "id": "fn:health.calculate_financial_health",
+        "score": 0.11563009446465672,
+        "rank": 2
+      },
+      {
+        "id": "cfg:health-v1",
+        "score": 0.046538818924049,
+        "rank": 3
+      },
+      {
+        "id": "cfg:health-v2",
+        "score": 0.04616389789535093,
+        "rank": 4
+      },
+      {
+        "id": "cfg:health-v3-draft",
+        "score": 0.044888822725838114,
+        "rank": 5
+      },
+      {
+        "id": "fn:health.calculate_margin_buffer",
+        "score": 0.043582926210041215,
+        "rank": 6
+      },
+      {
+        "id": "fn:api.get_trader_dashboard",
+        "score": 0.0,
+        "rank": 7
+      },
+      {
+        "id": "fn:health.calculate_liquidity_component",
+        "score": 0.0,
+        "rank": 8
+      },
+      {
+        "id": "fn:health.calculate_diversification",
+        "score": 0.0,
+        "rank": 9
+      },
+      {
+        "id": "fn:pnl.calculate_weekly_pnl",
+        "score": 0.0,
+        "rank": 10
+      },
+      {
+        "id": "fn:registry.deployed_mechanism",
+        "score": 0.0,
+        "rank": 11
+      },
+      {
+        "id": "fn:report.generate_weekly_report",
+        "score": 0.0,
+        "rank": 12
+      },
+      {
+        "id": "fn:sources.source",
+        "score": 0.0,
+        "rank": 13
+      },
+      {
+        "id": "fn:sources.load_positions",
+        "score": 0.0,
+        "rank": 14
+      },
+      {
+        "id": "data:portfolio_positions",
+        "score": 0.0,
+        "rank": 15
+      },
+      {
+        "id": "fn:sources.load_closing_prices",
+        "score": 0.0,
+        "rank": 16
+      },
+      {
+        "id": "data:market_closing_prices",
+        "score": 0.0,
+        "rank": 17
+      },
+      {
+        "id": "fn:sources.load_fx_rates",
+        "score": 0.0,
+        "rank": 18
+      },
+      {
+        "id": "data:reference_fx_rates",
+        "score": 0.0,
+        "rank": 19
+      },
+      {
+        "id": "fn:sources.load_cashflows",
+        "score": 0.0,
+        "rank": 20
+      },
+      {
+        "id": "data:client_cashflows",
+        "score": 0.0,
+        "rank": 21
+      },
+      {
+        "id": "fn:sources.load_margin_snapshot",
+        "score": 0.0,
+        "rank": 22
+      },
+      {
+        "id": "data:margin_snapshots",
+        "score": 0.0,
+        "rank": 23
+      },
+      {
+        "id": "fn:sources.load_client_profile",
+        "score": 0.0,
+        "rank": 24
+      },
+      {
+        "id": "data:client_profiles",
+        "score": 0.0,
+        "rank": 25
+      },
+      {
+        "id": "doc-weekly-report",
+        "score": 0.0,
+        "rank": 26
+      },
+      {
+        "id": "doc-health-old",
+        "score": 0.0,
+        "rank": 27
+      },
+      {
+        "id": "doc-health-draft",
+        "score": 0.0,
+        "rank": 28
+      },
+      {
+        "id": "doc-timeout",
+        "score": 0.0,
+        "rank": 29
+      }
+    ],
+    "bank-health": [
+      {
+        "id": "doc-health-old",
+        "score": 0.5418235594188303,
+        "rank": 1
+      },
+      {
+        "id": "doc-health-draft",
+        "score": 0.33509382857062997,
+        "rank": 2
+      },
+      {
+        "id": "doc-weekly-report",
+        "score": 0.14967556455733116,
+        "rank": 3
+      },
+      {
+        "id": "doc-feature-proposal",
+        "score": 0.08524276850779672,
+        "rank": 4
+      },
+      {
+        "id": "fn:api.get_trader_dashboard",
+        "score": 0.0,
+        "rank": 5
+      },
+      {
+        "id": "fn:health.calculate_liquidity_component",
+        "score": 0.0,
+        "rank": 6
+      },
+      {
+        "id": "fn:health.calculate_margin_buffer",
+        "score": 0.0,
+        "rank": 7
+      },
+      {
+        "id": "fn:health.calculate_diversification",
+        "score": 0.0,
+        "rank": 8
+      },
+      {
+        "id": "fn:health.calculate_financial_health",
+        "score": 0.0,
+        "rank": 9
+      },
+      {
+        "id": "fn:pnl.calculate_weekly_pnl",
+        "score": 0.0,
+        "rank": 10
+      },
+      {
+        "id": "fn:registry.deployed_mechanism",
+        "score": 0.0,
+        "rank": 11
+      },
+      {
+        "id": "fn:report.generate_weekly_report",
+        "score": 0.0,
+        "rank": 12
+      },
+      {
+        "id": "fn:sources.source",
+        "score": 0.0,
+        "rank": 13
+      },
+      {
+        "id": "fn:sources.load_positions",
+        "score": 0.0,
+        "rank": 14
+      },
+      {
+        "id": "data:portfolio_positions",
+        "score": 0.0,
+        "rank": 15
+      },
+      {
+        "id": "fn:sources.load_closing_prices",
+        "score": 0.0,
+        "rank": 16
+      },
+      {
+        "id": "data:market_closing_prices",
+        "score": 0.0,
+        "rank": 17
+      },
+      {
+        "id": "fn:sources.load_fx_rates",
+        "score": 0.0,
+        "rank": 18
+      },
+      {
+        "id": "data:reference_fx_rates",
+        "score": 0.0,
+        "rank": 19
+      },
+      {
+        "id": "fn:sources.load_cashflows",
+        "score": 0.0,
+        "rank": 20
+      },
+      {
+        "id": "data:client_cashflows",
+        "score": 0.0,
+        "rank": 21
+      },
+      {
+        "id": "fn:sources.load_margin_snapshot",
+        "score": 0.0,
+        "rank": 22
+      },
+      {
+        "id": "data:margin_snapshots",
+        "score": 0.0,
+        "rank": 23
+      },
+      {
+        "id": "fn:sources.load_client_profile",
+        "score": 0.0,
+        "rank": 24
+      },
+      {
+        "id": "data:client_profiles",
+        "score": 0.0,
+        "rank": 25
+      },
+      {
+        "id": "cfg:health-v1",
+        "score": 0.0,
+        "rank": 26
+      },
+      {
+        "id": "cfg:health-v2",
+        "score": 0.0,
+        "rank": 27
+      },
+      {
+        "id": "cfg:health-v3-draft",
+        "score": 0.0,
+        "rank": 28
+      },
+      {
+        "id": "doc-timeout",
+        "score": 0.0,
+        "rank": 29
+      }
+    ]
+  },
+  "rows": [
+    {
+      "query": "bank-report",
+      "method": "full",
+      "retrieved": [
+        "fn:api.get_trader_dashboard",
+        "fn:health.calculate_liquidity_component",
+        "fn:health.calculate_margin_buffer",
+        "fn:health.calculate_diversification",
+        "fn:health.calculate_financial_health",
+        "fn:pnl.calculate_weekly_pnl",
+        "fn:registry.deployed_mechanism",
+        "fn:report.generate_weekly_report",
+        "fn:sources.source",
+        "fn:sources.load_positions",
+        "data:portfolio_positions",
+        "fn:sources.load_closing_prices",
+        "data:market_closing_prices",
+        "fn:sources.load_fx_rates",
+        "data:reference_fx_rates",
+        "fn:sources.load_cashflows",
+        "data:client_cashflows",
+        "fn:sources.load_margin_snapshot",
+        "data:margin_snapshots",
+        "fn:sources.load_client_profile",
+        "data:client_profiles",
+        "cfg:health-v1",
+        "cfg:health-v2",
+        "cfg:health-v3-draft",
+        "doc-weekly-report",
+        "doc-feature-proposal",
+        "doc-health-old",
+        "doc-health-draft",
+        "doc-timeout"
+      ],
+      "gold": [
+        "fn:report.generate_weekly_report",
+        "fn:pnl.calculate_weekly_pnl",
+        "fn:health.calculate_financial_health",
+        "data:portfolio_positions",
+        "data:market_closing_prices",
+        "data:reference_fx_rates",
+        "data:client_cashflows",
+        "data:margin_snapshots",
+        "data:client_profiles"
+      ],
+      "complete": true,
+      "recall": 1.0,
+      "precision": 0.3103448275862069,
+      "context_bytes": 5885,
+      "median_ms": 0.000641,
+      "p95_ms": 0.0007820499999999996
+    },
+    {
+      "query": "bank-report",
+      "method": "vector",
+      "retrieved": [
+        "doc-weekly-report",
+        "doc-timeout",
+        "fn:api.get_trader_dashboard",
+        "fn:health.calculate_liquidity_component"
+      ],
+      "gold": [
+        "fn:report.generate_weekly_report",
+        "fn:pnl.calculate_weekly_pnl",
+        "fn:health.calculate_financial_health",
+        "data:portfolio_positions",
+        "data:market_closing_prices",
+        "data:reference_fx_rates",
+        "data:client_cashflows",
+        "data:margin_snapshots",
+        "data:client_profiles"
+      ],
+      "complete": false,
+      "recall": 0.0,
+      "precision": 0.0,
+      "context_bytes": 822,
+      "median_ms": 0.207752,
+      "p95_ms": 0.28005379999999996
+    },
+    {
+      "query": "bank-report",
+      "method": "structure",
+      "retrieved": [
+        "fn:report.generate_weekly_report",
+        "fn:sources.load_client_profile",
+        "fn:registry.deployed_mechanism",
+        "fn:pnl.calculate_weekly_pnl",
+        "fn:health.calculate_financial_health",
+        "data:client_profiles",
+        "fn:sources.source",
+        "fn:sources.load_positions",
+        "fn:sources.load_closing_prices",
+        "fn:sources.load_fx_rates",
+        "fn:sources.load_cashflows",
+        "fn:sources.load_margin_snapshot",
+        "fn:health.calculate_liquidity_component",
+        "fn:health.calculate_margin_buffer",
+        "fn:health.calculate_diversification",
+        "data:portfolio_positions",
+        "data:market_closing_prices",
+        "data:reference_fx_rates",
+        "data:client_cashflows",
+        "data:margin_snapshots"
+      ],
+      "gold": [
+        "fn:report.generate_weekly_report",
+        "fn:pnl.calculate_weekly_pnl",
+        "fn:health.calculate_financial_health",
+        "data:portfolio_positions",
+        "data:market_closing_prices",
+        "data:reference_fx_rates",
+        "data:client_cashflows",
+        "data:margin_snapshots",
+        "data:client_profiles"
+      ],
+      "complete": true,
+      "recall": 1.0,
+      "precision": 0.45,
+      "context_bytes": 3826,
+      "median_ms": 0.017486,
+      "p95_ms": 0.018953499999999998
+    },
+    {
+      "query": "bank-feature",
+      "method": "full",
+      "retrieved": [
+        "fn:api.get_trader_dashboard",
+        "fn:health.calculate_liquidity_component",
+        "fn:health.calculate_margin_buffer",
+        "fn:health.calculate_diversification",
+        "fn:health.calculate_financial_health",
+        "fn:pnl.calculate_weekly_pnl",
+        "fn:registry.deployed_mechanism",
+        "fn:report.generate_weekly_report",
+        "fn:sources.source",
+        "fn:sources.load_positions",
+        "data:portfolio_positions",
+        "fn:sources.load_closing_prices",
+        "data:market_closing_prices",
+        "fn:sources.load_fx_rates",
+        "data:reference_fx_rates",
+        "fn:sources.load_cashflows",
+        "data:client_cashflows",
+        "fn:sources.load_margin_snapshot",
+        "data:margin_snapshots",
+        "fn:sources.load_client_profile",
+        "data:client_profiles",
+        "cfg:health-v1",
+        "cfg:health-v2",
+        "cfg:health-v3-draft",
+        "doc-weekly-report",
+        "doc-feature-proposal",
+        "doc-health-old",
+        "doc-health-draft",
+        "doc-timeout"
+      ],
+      "gold": [
+        "fn:health.calculate_financial_health",
+        "fn:report.generate_weekly_report",
+        "fn:api.get_trader_dashboard"
+      ],
+      "complete": true,
+      "recall": 1.0,
+      "precision": 0.10344827586206896,
+      "context_bytes": 5885,
+      "median_ms": 0.000651,
+      "p95_ms": 0.0007419999999999999
+    },
+    {
+      "query": "bank-feature",
+      "method": "vector",
+      "retrieved": [
+        "doc-feature-proposal",
+        "fn:health.calculate_financial_health",
+        "cfg:health-v1",
+        "cfg:health-v2"
+      ],
+      "gold": [
+        "fn:health.calculate_financial_health",
+        "fn:report.generate_weekly_report",
+        "fn:api.get_trader_dashboard"
+      ],
+      "complete": false,
+      "recall": 0.3333333333333333,
+      "precision": 0.25,
+      "context_bytes": 1425,
+      "median_ms": 0.22748649999999998,
+      "p95_ms": 0.40442914999999985
+    },
+    {
+      "query": "bank-feature",
+      "method": "structure",
+      "retrieved": [
+        "fn:health.calculate_margin_buffer",
+        "fn:health.calculate_financial_health",
+        "fn:api.get_trader_dashboard",
+        "fn:report.generate_weekly_report"
+      ],
+      "gold": [
+        "fn:health.calculate_financial_health",
+        "fn:report.generate_weekly_report",
+        "fn:api.get_trader_dashboard"
+      ],
+      "complete": true,
+      "recall": 1.0,
+      "precision": 0.75,
+      "context_bytes": 1393,
+      "median_ms": 0.003905,
+      "p95_ms": 0.005695649999999995
+    },
+    {
+      "query": "bank-health",
+      "method": "full",
+      "retrieved": [
+        "fn:api.get_trader_dashboard",
+        "fn:health.calculate_liquidity_component",
+        "fn:health.calculate_margin_buffer",
+        "fn:health.calculate_diversification",
+        "fn:health.calculate_financial_health",
+        "fn:pnl.calculate_weekly_pnl",
+        "fn:registry.deployed_mechanism",
+        "fn:report.generate_weekly_report",
+        "fn:sources.source",
+        "fn:sources.load_positions",
+        "data:portfolio_positions",
+        "fn:sources.load_closing_prices",
+        "data:market_closing_prices",
+        "fn:sources.load_fx_rates",
+        "data:reference_fx_rates",
+        "fn:sources.load_cashflows",
+        "data:client_cashflows",
+        "fn:sources.load_margin_snapshot",
+        "data:margin_snapshots",
+        "fn:sources.load_client_profile",
+        "data:client_profiles",
+        "cfg:health-v1",
+        "cfg:health-v2",
+        "cfg:health-v3-draft",
+        "doc-weekly-report",
+        "doc-feature-proposal",
+        "doc-health-old",
+        "doc-health-draft",
+        "doc-timeout"
+      ],
+      "gold": [
+        "cfg:health-v2",
+        "fn:registry.deployed_mechanism",
+        "fn:health.calculate_financial_health",
+        "fn:health.calculate_liquidity_component",
+        "fn:health.calculate_margin_buffer",
+        "fn:health.calculate_diversification"
+      ],
+      "complete": true,
+      "recall": 1.0,
+      "precision": 0.20689655172413793,
+      "context_bytes": 5885,
+      "median_ms": 0.000661,
+      "p95_ms": 0.0007264999999999999
+    },
+    {
+      "query": "bank-health",
+      "method": "vector",
+      "retrieved": [
+        "doc-health-old",
+        "doc-health-draft",
+        "doc-weekly-report",
+        "doc-feature-proposal"
+      ],
+      "gold": [
+        "cfg:health-v2",
+        "fn:registry.deployed_mechanism",
+        "fn:health.calculate_financial_health",
+        "fn:health.calculate_liquidity_component",
+        "fn:health.calculate_margin_buffer",
+        "fn:health.calculate_diversification"
+      ],
+      "complete": false,
+      "recall": 0.0,
+      "precision": 0.0,
+      "context_bytes": 1021,
+      "median_ms": 0.206125,
+      "p95_ms": 0.32788124999999996
+    },
+    {
+      "query": "bank-health",
+      "method": "structure",
+      "retrieved": [
+        "cfg:health-v2",
+        "fn:registry.deployed_mechanism",
+        "fn:health.calculate_financial_health",
+        "fn:sources.load_cashflows",
+        "fn:sources.load_margin_snapshot",
+        "fn:sources.load_positions",
+        "fn:health.calculate_liquidity_component",
+        "fn:health.calculate_margin_buffer",
+        "fn:health.calculate_diversification",
+        "data:client_cashflows",
+        "fn:sources.source",
+        "data:margin_snapshots",
+        "data:portfolio_positions"
+      ],
+      "gold": [
+        "cfg:health-v2",
+        "fn:registry.deployed_mechanism",
+        "fn:health.calculate_financial_health",
+        "fn:health.calculate_liquidity_component",
+        "fn:health.calculate_margin_buffer",
+        "fn:health.calculate_diversification"
+      ],
+      "complete": true,
+      "recall": 1.0,
+      "precision": 0.46153846153846156,
+      "context_bytes": 2732,
+      "median_ms": 0.025848000000000003,
+      "p95_ms": 0.05537844999999998
+    }
+  ],
+  "summary": [
+    {
+      "method": "full",
+      "complete": 3,
+      "queries": 3,
+      "recall": 1.0,
+      "context_bytes": 5885,
+      "median_ms": 0.000651,
+      "precision": 0.20689655172413793
+    },
+    {
+      "method": "vector",
+      "complete": 0,
+      "queries": 3,
+      "recall": 0.1111111111111111,
+      "context_bytes": 1089,
+      "median_ms": 0.207752,
+      "precision": 0.08333333333333333
+    },
+    {
+      "method": "structure",
+      "complete": 3,
+      "queries": 3,
+      "recall": 1.0,
+      "context_bytes": 2650,
+      "median_ms": 0.017486,
+      "precision": 0.5538461538461539
+    }
+  ]
+}

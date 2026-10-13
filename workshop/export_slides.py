@@ -4,17 +4,18 @@ import json
 from pptx import Presentation
 from pptx.util import Inches,Pt
 from pptx.dml.color import RGBColor
+from pptx.enum.shapes import MSO_SHAPE
 from reportlab.pdfgen import canvas
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 import textwrap
-R=Path(__file__).parent;slides=json.loads((R/'slides.json').read_text());D=json.loads((R/'results.json').read_text())
+R=Path(__file__).parent;slides=json.loads((R/'slides.json').read_text());content=json.loads((R/'workshop-content.json').read_text());D=json.loads((R/'bank-results.json').read_text())
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 fig,axs=plt.subplots(1,2,figsize=(11,3.5),layout='constrained')
 labels=[x['method'] for x in D['summary']];colors=['#8da1b8','#4da4ee','#f2b65a','#3dc6aa']
-for ax,field,title in zip(axs,['complete','context_bytes'],['Úplné sady důkazů (z 24)','Průměrný kontext (UTF-8 bajty)']):
+for ax,field,title in zip(axs,['complete','context_bytes'],['Úplné sady důkazů (ze 3)','Průměrný kontext (UTF-8 bajty)']):
  vals=[x[field] for x in D['summary']];ax.bar(labels,vals,color=colors);ax.set_title(title);ax.spines[['top','right']].set_visible(False)
  for i,v in enumerate(vals):ax.text(i,v+max(vals)*.02,str(v),ha='center')
  ax.set_ylim(0,max(vals)*1.18)
@@ -26,25 +27,41 @@ for i,(title,sub,bullets,note) in enumerate(slides):
   box=slide.shapes.add_textbox(Inches(x),Inches(y),Inches(w),Inches(h));tf=box.text_frame;tf.word_wrap=True
   for j,line in enumerate(txt.split('\n')):
    p=tf.paragraphs[0] if j==0 else tf.add_paragraph();p.text=line;p.font.size=Pt(size);p.font.color.rgb=RGBColor.from_string(color);p.font.name='DejaVu Sans';p.space_after=Pt(14)
- text(.6,.2,12,.4,f'LLM MEMORY LAB · {i+1:02}/12',12,'A9BBD6');text(.6,.8,12,1.1,title,32);text(.6,1.95,12,.6,sub,21,'75DFC8')
- if i==7:slide.shapes.add_picture(str(R/'results-chart.png'),Inches(.8),Inches(2.8),width=Inches(11.6))
- else:text(.7,2.8,12,4.3,'\n'.join('• '+b for b in bullets),23)
+ if i in [4,5,9]:
+  text(.5,.18,12,.3,f'LLM MEMORY LAB · {i+1:02}/12 · MODELOVÁ BANKOVNÍ PLATFORMA',10,'A9BBD6')
+  text(.5,.62,12,.5,title,27);text(.5,1.16,12,.4,sub,16,'75DFC8')
+  asset={4:'bank-report-evidence.png',5:'bank-feature-evidence.png',9:'bank-health-evidence.png'}[i]
+  slide.shapes.add_picture(str(R/asset),Inches(.5),Inches(1.65),width=Inches(12.3),height=Inches(5.8))
+ else:
+  text(.6,.2,12,.4,f'LLM MEMORY LAB · {i+1:02}/12',12,'A9BBD6');text(.6,.8,12,1.1,title,32);text(.6,1.95,12,.6,sub,21,'75DFC8')
+  if i==7:slide.shapes.add_picture(str(R/'results-chart.png'),Inches(.8),Inches(2.8),width=Inches(11.6))
+  else:text(.7,2.8,12,3.5,'\n'.join('• '+b for b in bullets),20)
+  text(.7,6.35,12,.95,content[i]['example'],16,'75DFC8')
  slide.notes_slide.notes_text_frame.text=note
 prs.save(R/'presentation.pptx')
 pdfmetrics.registerFont(TTFont('DejaVu','/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf'))
 c=canvas.Canvas(str(R/'presentation.pdf'),pagesize=(960,540));c.setTitle('Paměť LLM agenta: 30minutový workshop')
 for i,(title,sub,bullets,note) in enumerate(slides):
  c.setFillColorRGB(.063,.09,.157);c.rect(0,0,960,540,fill=1,stroke=0)
- c.setFillColorRGB(.67,.75,.84);c.setFont('DejaVu',11);c.drawString(42,507,f'LLM MEMORY LAB · {i+1:02}/12')
- c.setFillColorRGB(.94,.96,1);c.setFont('DejaVu',29);c.drawString(42,450,title)
- c.setFillColorRGB(.46,.87,.78);c.setFont('DejaVu',18);c.drawString(42,405,sub)
- if i==7:c.drawImage(str(R/'results-chart.png'),42,80,width=870,height=277)
+ c.setFillColorRGB(.67,.75,.84);c.setFont('DejaVu',11);c.drawString(42,514,f'LLM MEMORY LAB · {i+1:02}/12 · MODELOVÁ BANKOVNÍ PLATFORMA')
+ if i in [4,5,9]:
+  c.setFillColorRGB(.94,.96,1);c.setFont('DejaVu',25);c.drawString(42,480,title)
+  c.setFillColorRGB(.46,.87,.78);c.setFont('DejaVu',16);c.drawString(42,451,sub)
+  asset={4:'bank-report-evidence.png',5:'bank-feature-evidence.png',9:'bank-health-evidence.png'}[i]
+  c.drawImage(str(R/asset),42,8,width=876,height=438)
  else:
-  c.setFillColorRGB(.94,.96,1);c.setFont('DejaVu',19);y=352
-  for b in bullets:
-   for j,line in enumerate(textwrap.wrap(b,76)):
-    c.drawString(42,y,('• ' if j==0 else '  ')+line);y-=28
-   y-=14
+  c.setFillColorRGB(.94,.96,1);c.setFont('DejaVu',29);c.drawString(42,450,title)
+  c.setFillColorRGB(.46,.87,.78);c.setFont('DejaVu',18);c.drawString(42,405,sub)
+  if i==7:c.drawImage(str(R/'results-chart.png'),42,80,width=870,height=277)
+  else:
+   c.setFillColorRGB(.94,.96,1);c.setFont('DejaVu',17);y=350
+   for b in bullets:
+    for j,line in enumerate(textwrap.wrap(b,88)):
+     c.drawString(42,y,('• ' if j==0 else '  ')+line);y-=25
+    y-=12
+  c.setFillColorRGB(.46,.87,.78);c.setFont('DejaVu',14);y=66
+  for line in textwrap.wrap(content[i]['example'],110):
+   c.drawString(42,y,line);y-=20
  c.showPage()
 c.save()
 print('Created presentation.pptx, presentation.pdf, results-chart.png')

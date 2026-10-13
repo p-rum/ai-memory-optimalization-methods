@@ -1,0 +1,157 @@
+[
+  {
+    "title": "Paměť agenta pro podporu obchodníků",
+    "subtitle": "30 minut · od dat reportu až k mechanismu výpočtu",
+    "bullets": [
+      "Agent má vysvětlit report, dopady změny kódu a aktuální výpočet skóre.",
+      "Nestačí podobný dokument: potřebujeme zdroje, vazby a správnou verzi.",
+      "Ukážeme stejné otázky přes textové hledání a přes strukturovanou paměť.",
+      "Platforma i klient jsou modeloví; kód a naměřené výsledky jsou přiložené."
+    ],
+    "example": "Tři otázky: původ dat → dopady feature → aktuální mechanismus finančního zdraví.",
+    "notes": "Čas: 0–2 min\n\nCíl slidu\nVysvětlit princip paměti na modelové platformě podpory burzovních obchodníků.\n\nCo říct nahlas (lze přečíst)\n„Dnes použijeme příklady blízké naší podpůrné platformě pro obchodníky na burze. Agent má vysvětlit, odkud report čerpá data, co se změní při nové funkci a jak se dnes počítá finanční zdraví klienta. U každé otázky si ukážeme, proč nestačí najít text se správnými slovy. Potřebujeme dohledat skutečné zdroje a vazby a rozlišit platnou verzi od starého dokumentu. Nepracujeme s naším produkčním kódem ani skutečným klientem. Je to malá spustitelná modelová platforma, na které lze princip ověřit.“\n\nCo udělat\nZeptejte se: „Která z těchto tří otázek nám dnes zabere nejvíc času?“ Vyžádejte jednu odpověď, nejvýše 30 sekund.\n\nOčekávaná odpověď / výsledek\nLibovolná z trojice je v pořádku. Připomeňte, že cílem je vysvětlit postup vybavení důkazů, ne zavádět nový produkt.\n\nPřechod na další slide\nPojďme stejný princip ověřit v dalším kroku.\n\nNa co si dát pozor\nNikdy neříkejte, že modelová formule je skutečný bankovní scoring nebo že graf zachycuje vaši produkci.",
+    "time": "0–2 min"
+  },
+  {
+    "title": "Co vlastně šetříme?",
+    "subtitle": "Kontext modelu, úložiště a RAM jsou různé věci",
+    "bullets": [
+      "Kontext je text poslaný modelu; delší zadání spotřebuje více tokenů.",
+      "Úložiště drží všechny zdroje a indexy, i když je model právě nevidí.",
+      "RAM je pracovní paměť běžícího systému; latence je čas do výsledku.",
+      "V ukázce měříme délku vybraného textu v bajtech a úplnost důkazů."
+    ],
+    "example": "Archiv dokumentů zůstává v úložišti; model má dostat jen ověřené podklady ke konkrétnímu reportu.",
+    "notes": "Čas: 2–4 min\n\nCíl slidu\nZabránit záměně menšího promptu, menší databáze a menší RAM.\n\nCo říct nahlas (lze přečíst)\n„Představte si knihovnu. V regálech může být tisíc knih, ale pro jednu odpověď otevřeme jen několik stránek. Regály odpovídají úložišti a vybrané stránky kontextu modelu. Vytvořit index nám pomůže stránky najít, ale index sám zabere další místo. Proto graf ani vektorová databáze automaticky nezmenšují celou paměť systému. Často šetří hlavně to, co předáváme modelu. Token je jednotka textu používaná modelem, přibližně část slova. My zde počítáme bajty textu: snadno je změříme, ale nejsou totéž co tokeny.“\n\nCo udělat\nUkažte postup „uložené zdroje → vyhledání → několik důkazů → model“. Zeptejte se: „Když přidáme index, musí se zmenšit databáze?“\n\nOčekávaná odpověď / výsledek\nNe. Index může úložiště i RAM zvětšit, přesto zmenšit vrácený kontext.\n\nPřechod na další slide\n„Teď se podíváme na několik způsobů, jak ty regály a kartotéku uspořádat.“\n\nNa co si dát pozor\nÚspora bajtů v našich výsledcích není změřená úspora RAM, tokenů ani finančních nákladů.",
+    "time": "2–4 min"
+  },
+  {
+    "title": "Pět způsobů uložení",
+    "subtitle": "Každá struktura zachovává jiný druh informace",
+    "bullets": [
+      "Historie uchová původní zprávy; souhrn je zkrátí, ale může ztratit výjimku.",
+      "JSON nebo SQL drží přesné hodnoty, například jazyk uživatele a verzi vlastníka.",
+      "Textové epizody popisují zkušenosti; vektory pomohou najít podobný záznam.",
+      "Knowledge Graph propojuje entity vztahy, například služba → databáze → tým."
+    ],
+    "example": "Profil klienta = přesný stav; incident reportu = zkušenost; report → výpočet → datový zdroj = vztahy.",
+    "notes": "Čas: 4–6 min\n\nCíl slidu\nUkázat, že graf a vektory nejsou jediné možnosti.\n\nCo říct nahlas (lze přečíst)\n„Historie je nejjednodušší: uchováme, co se stalo. Čím je delší, tím obtížněji ji celou předáváme modelu. Souhrn pomůže, ale třeba vypustí větu, že určitý postup neplatí pro produkci. Přesné nastavení, jako měna reportu, je obvykle lepší uložit do pojmenovaného pole nebo tabulky. Incident je naproti tomu příběh s příznaky a řešením, takže se hodí text. A pokud potřebujeme vědět, které služby závisejí na které databázi, pomůže explicitní síť vztahů. Nemusíme vybrat jedinou strukturu pro všechno. Jedna událost může mít textový originál i strukturované údaje.“\n\nCo udělat\nPožádejte jednoho účastníka, aby zařadil informaci „report klienta je v EUR“. Potom informaci „timeout jsme vyřešili omezením souběžných požadavků“.\n\nOčekávaná odpověď / výsledek\nJazyk: přesný stav v JSON/SQL. Postup řešení incidentu: textová zkušenost, případně ověřený návod.\n\nPřechod na další slide\n„Na stejných datech si ukážeme tři otázky, které potřebují různé druhy paměti.“\n\nNa co si dát pozor\nSouhrn, SQL a graf mohou být stejně užitečné. Nevytvářejte dojem, že graf je automaticky nejpokročilejší správné řešení.",
+    "time": "4–6 min"
+  },
+  {
+    "title": "Tři otázky z podpory tradingu",
+    "subtitle": "Každá otázka potřebuje jiný pohled na platformu",
+    "bullets": [
+      "A: „Odkud se berou data pro týdenní report?“ Sledujeme datovou lineage.",
+      "B: „Co ovlivní feature what-if margin?“ Hledáme přímé i nepřímé volající.",
+      "C: „Jaký je současný výpočet finančního zdraví?“ Potřebujeme kód i platnou konfiguraci.",
+      "Ve dvojici tipněte: jaký důkaz by vám k odpovědi nestačil?"
+    ],
+    "example": "Lineage = cesta původu dat. Dopad feature = cesta od měněné funkce k jejím uživatelům.",
+    "notes": "Čas: 6–8 min\n\nCíl slidu\nVysvětlit princip paměti na modelové platformě podpory burzovních obchodníků.\n\nCo říct nahlas (lze přečíst)\n„První otázka začíná výsledkem, tedy reportem, a jde zpět ke zdrojům. Druhá začíná změnou funkce a jde opačně k místům, která funkci používají. Třetí potřebuje zjistit nejen vzorec v kódu, ale i to, která verze a váhy jsou skutečně nasazené. Dokument s názvem současný výpočet může být jen návrh. Tyto otázky jsou záměrně o vazbách a platnosti. Výsledky nám proto neřeknou, jak dobře bychom našli podobný incident nebo parafrázi v dokumentech.“\n\nCo udělat\nDejte dvojicím 30 sekund. Potom vysvětlete: report má lineage; feature má call graph; mechanismus má deployment registry a kód. Call graph znamená graf, kdo kterou funkci volá.\n\nOčekávaná odpověď / výsledek\nA: nestačí uživatelský popis reportu. B: nestačí návrh nové feature. C: nestačí staré pravidlo ani nenasazený draft.\n\nPřechod na další slide\nPojďme stejný princip ověřit v dalším kroku.\n\nNa co si dát pozor\nTři otázky nejsou reprezentativní test všech možností paměti. Záměrně odpovídají potřebám podpůrné platformy.",
+    "time": "6–8 min"
+  },
+  {
+    "title": "Vektory versus grafy: odkud jsou data?",
+    "subtitle": "Postupně odhalte rozdíl mezi podobností a návazností",
+    "bullets": [
+      "Vektor řadí texty podle podobnosti; graf navazuje konkrétní kód a datové zdroje.",
+      "Zelená znamená potřebný důkaz, oranžová podobný text, který nestačí.",
+      "Datová lineage projde report, výpočty a původní zdroje.",
+      "Graf nenahrazuje kontrolu správnosti vazeb a aktuálnosti indexu."
+    ],
+    "example": "Uživatel se ptá na report; odpověď musí vysvětlit pozice, ceny, FX, cash-flow, marže i profil klienta.",
+    "notes": "Čas: 8–10 min\n\nCíl slidu\nVysvětlit princip paměti na modelové platformě podpory burzovních obchodníků.\n\nCo říct nahlas (lze přečíst)\n„Vlevo je textový vyhledávač. Najde například popis reportu, protože se velmi podobá otázce. To nám pomůže se zorientovat, ale ještě z toho nevíme, odkud přichází každé číslo. Vpravo je graf vytvořený ze skutečných volání v našem modelovém kódu a deklarací datových zdrojů. Z reportu přejdeme k PnL a finančnímu zdraví a dál ke zdrojům. Skóre podobnosti je číslo, ne pravděpodobnost pravdivosti. Oranžový dokument není nutně chybný: prostě neposkytuje potřebný důkaz. V ukázce známe počáteční funkci předem, což je důležitá výhoda grafového postupu.“\n\nCo udělat\nV HTML nechte otázku A (report) a top-k 4. Klikněte Uložení, Otázka, Hledání, Důkazy. Na každý krok 15–20 sekund. Ukažte vlevo doc-weekly-report, vpravo návaznost k datovým zdrojům. V PDF/PPTX je zobrazený konečný stav.\n\nOčekávaná odpověď / výsledek\nVektor@4 má 0/9 definovaných důkazů lineage; strukturovaný průchod 9/9. Popis reportu se neshoduje se seznamem kódu a zdrojů, který potřebujeme.\n\nPřechod na další slide\n„Teď začneme naopak od místa, které chceme změnit, a potom se podíváme na platnou verzi výpočtu.“\n\nNa co si dát pozor\nVektorový baseline je TF-IDF nad českými otázkami a převážně anglickým kódem. Nejde o test neuronových embeddingů. S devíti potřebnými důkazy nemůže top-4 vytvořit úplnou sadu; tento fakt vyslovte.",
+    "time": "8–10 min"
+  },
+  {
+    "title": "Feature a aktuální mechanismus",
+    "subtitle": "Dva další průchody nad stejnou modelovou platformou",
+    "bullets": [
+      "Změna calculate_margin_buffer dopadá na skóre, týdenní report i dashboard.",
+      "Aktuální health-v2 určuje nasazený registr, ne podobný název dokumentu.",
+      "V modelovém klientovi vychází demonstrační skóre 54,67 ze 100.",
+      "Podklady mají odkazy na konkrétní soubory; výpočet lze spustit offline."
+    ],
+    "example": "Otevřete bank-visual.html: přepněte otázku, pak postupně odhalte hledání a důkazy.",
+    "notes": "Čas: 10–15 min\n\nCíl slidu\nVysvětlit princip paměti na modelové platformě podpory burzovních obchodníků.\n\nCo říct nahlas (lze přečíst)\n„Při feature what-if margin chceme změnit výpočet maržové rezervy. Nestačí najít návrh této feature. Potřebujeme vědět, že funkci volá výpočet finančního zdraví a ten dále používá report i dashboard obchodníka. U mechanismu skóre zase vybíráme nejprve nasazenou verzi z registru. Historická v1 a budoucí návrh v3 jsou v paměti, ale nepředstavují současný stav. Nasazená v2 kombinuje likviditu, maržovou rezervu a diverzifikaci. Výsledné číslo je pouze modelová ukázka: neznáme skutečné pravidlo naší banky.“\n\nCo udělat\n10:00–12:00 — Otevřete bank-visual.html. Vyberte B (what-if margin), top-k 4. Nechte tipnout dvě dotčená místa. Klikněte na Hledání a Důkazy. Ukažte šipky od calculate_margin_buffer přes calculate_financial_health do reportu a dashboardu.\n12:00–14:00 — Vyberte C (současný mechanismus). Klikněte Otázka, Hledání, Důkazy. Vlevo ukažte historický dokument a draft. Vpravo porovnejte stav v1, nasazené v2 a nenasazené v3.\n14:00–15:00 — Přečtěte skóre 54,67. Řekněte, že kód byl skutečně spuštěn, ne že odpověděl LLM. Vraťte se na prezentaci. Python není potřeba spouštět během meetingu.\n\nOčekávaná odpověď / výsledek\nB/vector@4: 1/3 důkazů dopadu; graf: 3/3. C/vector@4: 0/6 potřebných důkazů mechanismu; registr + graf: 6/6. generate_weekly_report má PnL 460 EUR a skóre 54,67, verzi health-v2.\n\nPřechod na další slide\nPojďme stejný princip ověřit v dalším kroku.\n\nNa co si dát pozor\nŠipky u dopadů jsou směr analýzy od změny k volajícím, opačný než původní CALLS. Stará verze i draft mohou být užitečné pro jiné otázky; pro dnešní mechanismus ale nestačí.",
+    "time": "10–15 min"
+  },
+  {
+    "title": "Co jsme opravdu měřili?",
+    "subtitle": "Tři bankovní otázky nad spustitelným modelovým kódem",
+    "bullets": [
+      "Gold je předem určený seznam kódu, konfigurace a zdrojů potřebných k odpovědi.",
+      "Úplnost = všechny důkazy; recall = podíl nalezených potřebných důkazů.",
+      "Srovnáváme celý archiv, TF-IDF top-4 a graf s registrem nasazené verze.",
+      "Měříme bajty podkladů a čas hledání; LLM ani produkty zde neběží."
+    ],
+    "example": "U dopadů feature potřebujeme 3 důkazy; 1 nalezený znamená recall 1/3 a neúplnou odpověď.",
+    "notes": "Čas: 15–17 min\n\nCíl slidu\nVysvětlit princip paměti na modelové platformě podpory burzovních obchodníků.\n\nCo říct nahlas (lze přečíst)\n„Máme tři konkrétní otázky. Pro každou jsme určili, které zdroje musí odpověď doložit. U reportu je to devět důkazů lineage, u feature tři dotčená místa a u mechanismu šest zdrojů pravidla. Gold je název tohoto očekávaného seznamu. Sledujeme, zda se podařilo najít vše, a kolik textu vracíme. Strukturovaný postup prochází skutečný AST graf modelového kódu. AST je struktura programu přečtená parserem. U současného mechanismu navíc přesně filtruje registr verzí. Výběr počátečního symbolu a typu otázky máme zadaný předem.“\n\nCo udělat\nUkažte příklad 1/3 u feature. Zeptejte se: „Stačí to pro seznam všech dopadů?“ Pak vysvětlete, že čas hledání se opakoval 50krát a nezahrnuje ingest ani rozpoznání otázky.\n\nOčekávaná odpověď / výsledek\nNestačí. Chybí dvě používaná místa. Nalezené dokumenty ani úplná sada samy nedokazují správnou odpověď LLM.\n\nPřechod na další slide\nPojďme stejný princip ověřit v dalším kroku.\n\nNa co si dát pozor\nBudget není stejný: top-4 versus plný průchod. Český dotaz/anglický kód znevýhodňuje slovní baseline. Výsledky nelze přenést na neural RAG, Graphify nebo produkční banku.",
+    "time": "15–17 min"
+  },
+  {
+    "title": "Výsledky bankovní ukázky",
+    "subtitle": "Tři diagnostické otázky · nejde o žebříček produktů",
+    "bullets": [
+      "full: úplné důkazy 3/3 · průměr 5885 B",
+      "vector: úplné důkazy 0/3 · průměr 1089 B",
+      "structure: úplné důkazy 3/3 · průměr 2650 B"
+    ],
+    "example": "Strukturované vybavení vrací více důkazů než top-4; poctivě porovnáváme i množství textu.",
+    "notes": "Čas: 17–19 min\n\nCíl slidu\nPřečíst skutečné výsledky a jejich omezení.\n\nCo říct nahlas (lze přečíst)\n„Celý archiv obsahuje všechny podklady, takže má úplnost tři ze tří, ale posílá 5 885 bajtů textu. Vektorový top-4 vrací průměrně 1 089 bajtů a pro naše tři strukturované otázky nemá úplnou sadu. Graf s registrem má úplné sady pro tři otázky a vrací průměrně 2 650 bajtů. Tedy není nejmenší: vrací i zdroje, které potřebujeme. Oproti celému archivu omezí text asi o 55 procent. To podporuje názornou myšlenku vybavení podle vazeb, ale není to obecný důkaz vítězství grafů. Úlohy jsme zvolili podle potřeb platformy a rozpočty strategií nejsou stejné.“\n\nCo udělat\nUkažte vlevo úplnost, vpravo velikost textu. Porovnejte nejprve full/structure, potom vector/structure. Nečtěte drobné časy.\n\nOčekávaná odpověď / výsledek\nfull 3/3; vector 0/3; structure 3/3. Context 5 885, 1 089 a 2 650 B. Méně textu není výhra, pokud chybí důkaz.\n\nPřechod na další slide\n„Které nástroje takové vazby umějí zprostředkovat agentovi?“\n\nNa co si dát pozor\nDůvody omezení: tři otázky, modelová data, TF-IDF, české dotazy a anglický kód, známý router/symbol, různý budget. Chyby extrakce a skutečné LLM odpovědi je potřeba měřit zvlášť.",
+    "time": "17–19 min"
+  },
+  {
+    "title": "Jak se v nástrojích orientovat?",
+    "subtitle": "Vybírejte podle otázky, kterou má agent zvládnout",
+    "bullets": [
+      "Graphify a GitNexus mapují kód: kde je funkce a na čem závisí její použití?",
+      "Graphiti řeší fakta měnící se v čase: kdo byl a kdo je vlastníkem?",
+      "Cognee a Mem0 pomáhají s pamětí znalostí, konverzací a uživatelského kontextu.",
+      "LightRAG a Microsoft GraphRAG propojují dokumenty; GraphRAG využívá i souhrny komunit."
+    ],
+    "example": "Repozitář a dopady feature → Graphify/GitNexus. Historie pravidel → Graphiti + verzovaný stav.",
+    "notes": "Čas: 19–21 min\n\nCíl slidu\nPředstavit výběr nástrojů bez potřeby znát jejich instalaci či architekturu.\n\nCo říct nahlas (lze přečíst)\n„Názvy nástrojů berte jako kandidáty pro různé úlohy. Graphify a GitNexus jsou nejbližší naší ukázce dopadů what-if margin: pomáhají agentovi orientovat se ve struktuře repozitáře. Graphify zde označuje Graphify-Labs a používá grafové vybavení; GitNexus nabízí i kombinaci textových signálů. Graphiti se zaměřuje na fakta s časovou platností. Cognee a Mem0 jsou kandidáti pro paměť znalostí a interakcí, ale záleží na konkrétní verzi a nasazení. LightRAG a GraphRAG míří na otázky nad dokumenty. Jejich vlastnosti jsme ověřili v dokumentaci, tyto produkty jsme však v našem měření nespouštěli.“\n\nCo udělat\nVolitelně otevřete tools-comparison.html, první nástroj Graphify, druhý GitNexus. Ukažte řádky „Vhodné použití“ a „Co ověřit“. Nečtěte všech sedm nástrojů ani neinstalujte software. Při nedostatku času zůstaňte na slidu.\n\nOčekávaná odpověď / výsledek\nPro dopady funkce se nejprve nabízí Graphify/GitNexus; pro časovou historii Graphiti a SQL baseline. Volba není pořadí kvality.\n\nPřechod na další slide\n„Ať vybereme kterýkoli nástroj, musíme navrhnout, co se při změně informace stane.“\n\nNa co si dát pozor\nGraphify není Graphiti. OSS je otevřená varianta softwaru; hosted Platform je spravovaná služba, jejíž vlastnosti mohou být jiné. Aktuální primární zdroje a rozdíly jsou v tools-comparison.md.",
+    "time": "19–21 min"
+  },
+  {
+    "title": "Jak ověřit současný mechanismus?",
+    "subtitle": "Registr platnosti + implementace + vstupy výpočtu",
+    "bullets": [
+      "V1 je historická, v2 nasazená a v3 pouze návrh; podobný text je nerozliší sám.",
+      "V2 váží likviditu 50 %, maržovou rezervu 30 % a diverzifikaci 20 %.",
+      "Zdrojové funkce normalizují vstupy a vracejí souhrnné skóre 0–100.",
+      "U odpovědi uveďte verzi, datum a původ pravidla; při chybě důkazu přiznejte nejistotu."
+    ],
+    "example": "Modelové komponenty: 0,3333; 1,0; 0,4. Výsledek = 100 × (0,5L + 0,3M + 0,2D) = 54,67.",
+    "notes": "Čas: 21–24 min\n\nCíl slidu\nVysvětlit princip paměti na modelové platformě podpory burzovních obchodníků.\n\nCo říct nahlas (lze přečíst)\n„Na otázku současný mechanismus nestačí odpovědět vzorcem nalezeným v dokumentaci. Musíme doložit verzi, která je nasazená k danému datu, její váhy a kód, který je používá. V modelové v2 je likvidita dostupná hotovost dělená očekávaným odtokem a potom dvěma, omezená na nula až jedna. Maržová komponenta je rezerva nad initial margin v poměru k equity, dělená půlkou, také omezená. Diverzifikace je jedna minus podíl největší pozice. Vážené komponenty vynásobíme stem. Výpočet zde slouží pro ilustraci vysvětlení původu čísla; nehodnotíme bonitu ani nepředstavujeme pravidlo naší banky.“\n\nCo udělat\nUkažte registry verze v1/v2/v3, pak tři komponenty a výsledek. Pokud je formule příliš detailní, stačí číst váhy a říct, že způsob normalizace je ve zdrojovém kódu. Zeptejte se: „Co by chybělo v odpovědi, kdybychom neuvedli verzi?“\n\nOčekávaná odpověď / výsledek\nNevíme, zda jsou pravidlo a váhy aktuální. 13. 10. 2026 vybere modelový registry health-v2; v3-draft není nasazený ani po svém navrženém datu.\n\nPřechod na další slide\nPojďme stejný princip ověřit v dalším kroku.\n\nNa co si dát pozor\nŽádné produkční prahy nebo schvalovací rozhodnutí nejsou součástí modelu. Při historické otázce se mění váhy podle datové platnosti, ne podle názvu dokumentu.",
+    "time": "21–24 min"
+  },
+  {
+    "title": "Cvičení: agent pro trading platformu",
+    "subtitle": "Dvě minuty návrhu + dvě krátké odpovědi",
+    "bullets": [
+      "Agent má vysvětlit původ dat reportu, dopady feature a aktuální mechanismus skóre.",
+      "Pro každou otázku určete potřebné důkazy a způsob jejich vybavení.",
+      "Přidejte test: nový draft nesmí přepsat platné nasazené pravidlo.",
+      "Agent dostane nejvýše 1 000 tokenů podkladů; co zachováte a co vypustíte?"
+    ],
+    "example": "Pomůcka: lineage a dopady v grafu; platnost v registru; popisy a podobné incidenty v textu.",
+    "notes": "Čas: 24–27 min\n\nCíl slidu\nVysvětlit princip paměti na modelové platformě podpory burzovních obchodníků.\n\nCo říct nahlas (lze přečíst)\n„Ve dvojicích navrhněte paměť pro asistenta podpory obchodníků. Má odpovídat na tři dnešní otázky a vejít podklady do tisíce tokenů. Nevybírejte hned značku databáze. Řekněte, které důkazy potřebujete, jak se k nim dostanete a jak poznáte platnou verzi. Přidejte test, který by chybný návrh odhalil. Například nový draft nesmí změnit odpověď na současný mechanismus. Máte dvě minuty, potom uslyšíme dvě třicetisekundové odpovědi.“\n\nCo udělat\n24:00–26:00 práce dvojic, 26:00–27:00 dvě odpovědi. Při tichu nabídněte rozdělení text / graf / registry a zeptejte se na draft.\n\nOčekávaná odpověď / výsledek\nLineage přes datové vazby, dopady přes volající funkce, mechanismus přes platnou verzi a kód. Text pomáhá s popisy a zkušenostmi. Přijměte SQL joiny jako strukturovanou alternativu.\n\nPřechod na další slide\nPojďme stejný princip ověřit v dalším kroku.\n\nNa co si dát pozor\nGraf musí zachytit čerstvý commit; pro dynamické volání mohou být nutné testy. Nejde jen o výběr úložiště.",
+    "time": "24–27 min"
+  },
+  {
+    "title": "Co si odnést do dalšího návrhu?",
+    "subtitle": "Nejdřív otázky a důkazy, potom nástroj",
+    "bullets": [
+      "Podobná zkušenost: začněte hledáním v textu nebo vektorech.",
+      "Přesná hodnota: použijte pojmenovaný stav a kontrolu platnosti.",
+      "Návaznost objektů: použijte explicitní vztahy v grafu nebo tabulkové joiny.",
+      "Kombinaci ověřte na vlastních úlohách: správnost, délka kontextu a cena změn."
+    ],
+    "example": "Další krok: skutečný report, jedna navržená feature a platný registry mechanismů z vašeho repozitáře.",
+    "notes": "Čas: 27–30 min\n\nCíl slidu\nUzavřít bez tvrzení, že jedna struktura řeší všechny paměťové problémy.\n\nCo říct nahlas (lze přečíst)\n„Dnes jsme viděli, že podobnost textu, přesná hodnota a vztah mezi objekty jsou různé potřeby. U podobného incidentu může stačit textové hledání. U verze mechanismu potřebujeme platný stav a u lineage reportu konkrétní návaznost. Kombinace může zmenšit kontext, ale přináší také práci s extrakcí, aktualizacemi a výběrem správné cesty. Proto bych jako další krok nevolil okamžitě migraci na nový nástroj. Vybral bych skutečný report, jednu feature a několik časových otázek našeho týmu, určil potřebné důkazy a na nich porovnal jednoduchou variantu s kandidáty. Při výběru se ptejme nejen, zda systém něco našel, ale zda našel to, co odpověď potřebuje.“\n\nCo udělat\n27:00–29:00: dvě otázky z publika, případně z připraveného FAQ. 29:00–30:00: přečtěte závěrečný odstavec a ukažte odkaz na podklady. Ve 30:00 skončete.\n\nOčekávaná odpověď / výsledek\nÚčastníci by měli umět rozlišit tři úlohy, popsat přínos struktury a vědět, že naše výsledky mají omezený rozsah.\n\nPřechod na další slide\n„Podklady, zdrojový kód a měření jsou v repozitáři; detailní otázky můžeme rozebrat po meetingu.“\n\nNa co si dát pozor\nNa otázku, kterou neumíte zodpovědět, použijte: „Tohle jsme v ukázce neměřili; ověřme konkrétní verzi a přidejme test.“ Neimprovizujte produktové sliby.",
+    "time": "27–30 min"
+  }
+]

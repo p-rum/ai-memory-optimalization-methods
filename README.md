@@ -1,14 +1,14 @@
 # AI memory optimization methods
 
-Český interaktivní workshop o strukturování paměti LLM agenta pro vývojáře. **Maximálně 30 minut**, 12 slidů, Knowledge Graph × vektorové databáze, návrhové cvičení a vlastní měření.
+Český **30minutový interaktivní meeting** o paměti LLM agenta pro tým podpůrné platformy burzovních obchodníků.
 
-Začněte v **[workshop/README.md](workshop/README.md)**.
+Začněte [návodem](workshop/README.md) a [scénářem moderátora](workshop/facilitator.md). Scénář obsahuje slovníček, text k přednesu, přesná kliknutí a očekávané výsledky i pro méně zkušeného prezentujícího.
 
-- [Prezentace HTML](workshop/presentation.html), [PowerPoint](workshop/presentation.pptx), [PDF](workshop/presentation.pdf)
-- [Offline ukázka incidentů](workshop/demo.html), [ukázka nad skutečným kódem scikit-learn](workshop/source-demo.html)
-- [Scénář moderátora](workshop/facilitator.md), [tahák pro účastníky](workshop/handout.md)
-- [Měření modelového scénáře](workshop/experiment.md), [měření skutečného zdroje](workshop/real-source-experiment.md)
+- [Prezentace HTML](workshop/presentation.html), [PowerPoint](workshop/presentation.pptx), [PDF](workshop/presentation.pdf).
+- [Grafické srovnání vektorů a grafů](workshop/bank-visual.html): původ dat týdenního reportu, dopady feature what-if margin, platná verze mechanismu finančního zdraví.
+- [Příklady a výpočet podrobně](workshop/bank-guide.md), [vlastní měření](workshop/bank-experiment.md), [spustitelný modelový kód](workshop/bank_demo).
+- [Graphify a další nástroje](workshop/tools-comparison.md), [interaktivní porovnání dvojice](workshop/tools-comparison.html).
 
-Stáhněte Code → Download ZIP a otevřete `workshop/presentation.html` v prohlížeči. HTML je samostatné a nevyžaduje API klíč. Interakce ukazují předpočítané výsledky skutečného běhu; Python kód pro opakování je přiložen.
+Stáhněte **Code → Download ZIP**, rozbalte a otevřete `workshop/presentation.html`. Není potřeba API klíč ani instalace. Ukázky odhalují uložené výsledky skutečného běhu.
 
-Vektorový baseline používá TF‑IDF, nikoli neuronové embeddingy. Graf modelového scénáře a routing jsou připravené ručně; skutečný zdrojový příklad extrahuje explicitní importy z AST. Výsledky měří retrieval důkazů a bajty kontextu, ne kvalitu odpovědí LLM ani výkon produkčních databází. Metodická omezení jsou součástí podkladů.
+Používáme modelovou platformu a ilustrativní vzorec, nikoli skutečná data či bankovní metodiku. TF-IDF baseline, AST graf a registry mají popsaná omezení; výsledky nejsou benchmark produktů ani odpovědí LLM.
