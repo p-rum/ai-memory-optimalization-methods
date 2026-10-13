@@ -12,3 +12,7 @@ Začněte [návodem](workshop/README.md) a [scénářem moderátora](workshop/fa
 Stáhněte **Code → Download ZIP**, rozbalte a otevřete `workshop/presentation.html`. Není potřeba API klíč ani instalace. Ukázky odhalují uložené výsledky skutečného běhu.
 
 Používáme modelovou platformu a ilustrativní vzorec, nikoli skutečná data či bankovní metodiku. TF-IDF baseline, AST graf a registry mají popsaná omezení; výsledky nejsou benchmark produktů ani odpovědí LLM.
+
+## Paměť implementačního agenta
+
+Nová samostatná [30minutová prezentace](presentations/implementation-agent-memory/README.md) s příklady Kotlin / Spring Boot / PostgreSQL, porovnáním struktur a nástrojů a transparentním modelem nákladů včetně cache.
